@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nexo21 | Ecosistema SaaS{% endblock %}</title>
+    
+    <!-- CSS Estándar -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    
+    <!-- CSS Custom Premium -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <!-- SIDEBAR DINÁMICO -->
+    <nav id="sidebar">
+        <div class="logo-area">
+            <h4 class="mb-0">Nexo21 <i class="fas fa-layer-group text-info"></i></h4>
+            <small class="text-info">Core Orchestrator v1.0</small>
+        </div>
+        
+        <div class="nav flex-column mt-3">
+            <!-- App Selector (Opcional) -->
+            {% block app_selector %}{% endblock %}
+
+            <hr class="border-secondary opacity-25 mx-3">
+
+            <!-- Menú Principal de la App Activa -->
+            {% block sidebar_menu %}
+            <a href="/" class="nav-link active">
+                <i class="fas fa-home me-2 text-info"></i> Dashboard Global
+            </a>
+            {% endblock %}
+            
+            <hr class="border-secondary opacity-25 mx-3">
+
+            <!-- Configuración Global (Común a todo el ecosistema) -->
+            <div class="nav-item">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" data-bs-target="#menuConfigGlobal">
+                    <div>
+                        <i class="fas fa-cog me-2 text-muted"></i> 
+                        <span>Configuración</span>
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </a>
+                <div class="collapse" id="menuConfigGlobal">
+                    <div class="d-flex flex-column ms-3 mt-1 border-start border-secondary border-opacity-25">
+                        <a href="#" class="nav-link py-2 ps-4 small text-white-50">Mi Suscripción</a>
+                        <a href="#" class="nav-link py-2 ps-4 small text-white-50">Perfil de Usuario</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer del Sidebar -->
+        <div class="mt-auto p-3 text-center opacity-50 small">
+            <p>&copy; 2026 Nexo21 Ecosystem</p>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="main-content">
+        <!-- Header / Topbar (Opcional) -->
+        <header class="d-flex justify-content-between align-items-center mb-4 px-2">
+            <h2 class="h4 mb-0 text-dark">{% block page_title %}Resumen General{% endblock %}</h2>
+            <div class="user-profile d-flex align-items-center">
+                 <span class="me-3 d-none d-md-block">{{ user.username|default:"Admin User" }}</span>
+                 <div class="rounded-circle bg-info overflow-hidden shadow-sm" style="width: 40px; height: 40px;">
+                    <i class="fas fa-user-circle fa-2x text-white d-flex justify-content-center align-items-center h-100"></i>
+                 </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Body -->
+        <div class="container-fluid animate__animated animate__fadeIn">
+            {% block content %}
+            <div class="card p-5 shadow-sm text-center border-0" style="border-radius: 15px;">
+                <h1 class="display-5 fw-bold">Bienvenido al Core de Nexo21</h1>
+                <p class="lead text-muted">Selecciona una aplicación de tu ecosistema para comenzar.</p>
+                <div class="row g-4 mt-2">
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4 border-0 shadow-sm bg-light">
+                            <i class="fas fa-book-medical fa-3x text-info mb-3"></i>
+                            <h5>Clara Library</h5>
+                            <button class="btn btn-outline-info btn-sm">Abrir</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4 border-0 shadow-sm bg-light">
+                            <i class="fas fa-store fa-3x text-success mb-3"></i>
+                            <h5>Clara POS</h5>
+                            <button class="btn btn-outline-success btn-sm">Abrir</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 p-4 border-0 shadow-sm bg-light">
+                            <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                            <h5>Nuevo SaaS</h5>
+                            <button class="btn btn-outline-secondary btn-sm">Instalar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // Lógica de navegación active
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if(!this.getAttribute('data-bs-toggle')) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

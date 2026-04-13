@@ -1,0 +1,68 @@
+/* [CSS_BASE_01] Estilos globales para ClaraPos */
+:root {
+    --sidebar-width: 250px;
+    --clara-bg: #212529;
+    --clara-accent: #0dcaf0;
+    --clara-dark: #15181b;
+    --clara-border: #343a40;
+    --clara-text-muted: #adb5bd;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* SIDEBAR */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    background: var(--clara-bg);
+    color: white;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.logo-area {
+    padding: 25px 20px;
+    text-align: center;
+    background: var(--clara-dark);
+    border-bottom: 1px solid var(--clara-border);
+}
+
+#sidebar .nav-link {
+    color: var(--clara-text-muted);
+    padding: 12px 25px;
+    border-left: 4px solid transparent;
+    transition: 0.2s;
+}
+
+#sidebar .nav-link:hover, #sidebar .nav-link.active {
+    color: white;
+    background: #2c3034;
+    border-left: 4px solid var(--clara-accent);
+}
+
+/* CONTENIDO */
+#main-content {
+    margin-left: var(--sidebar-width);
+    padding: 30px;
+    transition: all 0.3s;
+}
+
+/* Estilo de Tarjetas y Botones como en la imagen */
+.card-header-custom {
+    background-color: var(--clara-bg);
+    color: white;
+    font-weight: bold;
+}
+
+.btn-guardar {
+    background-color: var(--clara-accent);
+    color: white;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+

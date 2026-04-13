@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClaraPos | v1.0 - Francisco J.</title>
+    
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div class="logo-area">
+            <h4 class="mb-0">Clara-4 <i class="fas fa-microchip"></i></h4>
+            <small class="text-info">v1.0 - Francisco J.</small>
+        </div>
+        
+        <div class="nav flex-column mt-3">
+            <a href="{% url 'crear_venta' %}" class="nav-link">
+                <i class="fas fa-shopping-cart me-2 text-success"></i> Nueva Venta
+            </a>
+
+            <div class="nav-item mb-1">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#menuInventario" aria-expanded="false">
+                    <div>
+                        <i class="fas fa-boxes me-2 text-info"></i> 
+                        <span>Inventario</span>
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </a>
+                
+                <div class="collapse" id="menuInventario">
+                    <div class="d-flex flex-column ms-3 mt-1 gap-1 border-start border-secondary border-opacity-25">
+                        <a href="{% url 'list_deps' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-tags me-2 text-info" style="width: 20px;"></i>
+                            Departamentos
+                        </a>
+                        <a href="{% url 'list_compras' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-truck-loading me-2 text-primary" style="width: 20px;"></i>
+                            Compras
+                        </a>
+                        <a href="{% url 'list_prods' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-barcode me-2 text-success" style="width: 20px;"></i>
+                            Productos/Servicios
+                        </a>
+                        <a href="{% url 'list_recetas' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fa-solid fa-receipt me-2 text-warning" style="width: 20px;"></i>
+                            Recetas
+                        </a>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-item mb-1">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center text-white" 
+                    data-bs-toggle="collapse" data-bs-target="#menuClientes" aria-expanded="false">
+                    <div>
+                        <i class="fas fa-users me-2 text-info"></i> <span>Clientes</span>
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </a>
+                
+                <div class="collapse" id="menuClientes">
+                    <div class="d-flex flex-column ms-3 mt-1 gap-1 border-start border-secondary border-opacity-25">
+                        <a href="{% url 'list_clients' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-address-card me-2 text-primary" style="width: 20px;"></i>
+                            Gestión de Clientes
+                        </a>
+                        <a href="{% url 'list_cxc' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-hand-holding-usd me-2 text-success" style="width: 20px;"></i>
+                            Cuentas por Cobrar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+               <div class="nav-item mb-1">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center text-white" 
+                    data-bs-toggle="collapse" data-bs-target="#menuClinica" aria-expanded="false">
+                    <div>
+                        <i class="fas fa-users me-2 text-info"></i> <span>Clinica</span>
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </a>
+                
+                <div class="collapse" id="menuClinica">
+                    <div class="d-flex flex-column ms-3 mt-1 gap-1 border-start border-secondary border-opacity-25">
+                        <a href="{% url 'list_historias' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-address-card me-2 text-primary" style="width: 20px;"></i>
+                            Historial Clinico
+                        </a>
+                        <a href="{% url 'list_citas' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-hand-holding-usd me-2 text-success" style="width: 20px;"></i>
+                            Agenda
+                        </a>
+                        <a href="{% url 'config_mapa' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-cog me-2 text-warning" style="width: 20px;"></i>
+                            Configuración
+                        </a>
+
+                    </div>
+                </div>
+            </div>  
+
+
+            <div class="nav-item">
+                <a class="nav-link d-flex align-items-center py-3" href="#" data-bs-toggle="collapse" data-bs-target="#menuReportes" aria-expanded="false">
+                    <i class="fas fa-chart-bar me-3 text-info" style="width: 20px;"></i>
+                    <span class="fw-bold">Reportes</span>
+                    <i class="fas fa-chevron-down ms-auto small opacity-50"></i>
+                </a>
+                
+                <div class="collapse" id="menuReportes">
+                    <div class="d-flex flex-column ms-3 mt-1 gap-1 border-start border-secondary border-opacity-25">
+                        <a href="{% url 'cuadre_caja' %}" class="nav-link py-2 ps-4 small text-white-50 d-flex align-items-center">
+                            <i class="fas fa-cash-register me-2 text-success" style="width: 20px;"></i>
+                            Cuadre de Caja
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="nav-item">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" data-bs-target="#menuConfig">
+                    <div>
+                        <i class="fas fa-sliders-h me-2 text-info"></i> 
+                        <span>Configuración</span>
+                    </div>
+                    <i class="fas fa-chevron-down small opacity-50"></i>
+                </a>
+                <div class="collapse" id="menuConfig">
+                    <div class="d-flex flex-column ms-3 mt-1 border-start border-secondary border-opacity-25">
+                        <a href="{% url 'list_tc' %}" class="nav-link py-2 ps-4 small text-white-50">Tasas de Cambio</a>
+                        <a href="#" class="nav-link py-2 ps-4 small text-white-50">Mi Perfil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="container-fluid animate__animated animate__fadeIn">
+            {% block content %}
+            <div class="card p-5 shadow-sm text-center mt-4">
+                <h1 class="display-4">Bienvenido, {{ user.first_name|default:"Francisco" }}</h1>
+                <p class="lead text-muted">Gestión administrativa profesional ClaraPos.</p>
+                <i class="fas fa-laptop-code fa-5x text-primary my-4"></i>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
+    {% block extra_body %}{% endblock %}
+    {% block scripts %}{% endblock %}
+
+    <script>
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+    
+</body>
+</html>

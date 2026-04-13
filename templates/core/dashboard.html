@@ -1,0 +1,108 @@
+{% extends "layout/master_base.html" %}
+
+{% block title %}Dashboard | Nexo21 Core{% endblock %}
+
+{% block page_title %}Panel Central de Gestión{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Resumen del Sistema -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-4" style="border-radius: 15px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);">
+            <h3 class="fw-bold mb-4">Bienvenido de nuevo, {{ user.username|default:"Administrador" }}</h3>
+            <p class="text-muted">Aquí tienes un resumen del estado actual de tu ecosistema SaaS.</p>
+            
+            <div class="row mt-4">
+                <div class="col-6 col-md-3 text-center border-end">
+                    <h2 class="fw-bold text-info">3</h2>
+                    <small class="text-muted text-uppercase">Apps Orquestadas</small>
+                </div>
+                <div class="col-6 col-md-3 text-center border-end">
+                    <h2 class="fw-bold text-success">12</h2>
+                    <small class="text-muted text-uppercase">Usuarios Activos</small>
+                </div>
+                <div class="col-6 col-md-3 text-center border-end">
+                    <h2 class="fw-bold text-primary">$450</h2>
+                    <small class="text-muted text-uppercase">Recaudado (Mes)</small>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                    <h2 class="fw-bold text-warning">24.50</h2>
+                    <small class="text-muted text-uppercase">Tasa BCV</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4 bg-dark text-white" style="border-radius: 15px;">
+            <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i> Acciones Rápidas</h5>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-light btn-sm text-start"><i class="fas fa-plus me-2"></i> Crear Nuevo Inquilino</button>
+                <button class="btn btn-outline-light btn-sm text-start"><i class="fas fa-file-invoice-dollar me-2"></i> Reporte de Cobros</button>
+                <button class="btn btn-outline-light btn-sm text-start"><i class="fas fa-shield-alt me-2"></i> Auditoría de Seguridad</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Saas (Cards Pro) -->
+    <div class="col-12">
+        <h4 class="fw-bold my-4">Mis Aplicaciones Satélites</h4>
+        <div class="row g-4">
+            <!-- Clara Library Card -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-grow overflow-hidden" style="border-radius: 20px;">
+                    <div class="bg-info p-3 text-center">
+                        <i class="fas fa-university fa-3x text-white"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Clara Library</h5>
+                        <p class="small text-muted">Gestión de documentos legales para Venezuela con sistema de comunidad.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge bg-success-soft text-success px-3">Activo</span>
+                            <a href="#" class="btn btn-info btn-sm rounded-pill px-4 shadow-sm">Entrar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clara POS Card -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-grow overflow-hidden" style="border-radius: 20px;">
+                    <div class="bg-success p-3 text-center">
+                        <i class="fas fa-cash-register fa-3x text-white"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold">Clara POS</h5>
+                        <p class="small text-muted">Punto de venta multimoneda, inventarios y gestión de clínica.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge bg-success-soft text-success px-3">Activo</span>
+                            <a href="#" class="btn btn-success btn-sm rounded-pill px-4 shadow-sm">Entrar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Modue Placeholder -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm border-dashed" style="border-radius: 20px; border: 2px dashed #dee2e6; background: transparent;">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-5">
+                        <div class="rounded-circle bg-light p-3 mb-3">
+                            <i class="fas fa-plus fa-2x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted fw-bold">Nuevo SaaS</h5>
+                        <p class="small text-muted">Desarrolla e integra un nuevo módulo al ecosistema.</p>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill mt-2">Explorar SDK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-grow { transition: transform 0.3s; }
+    .hover-grow:hover { transform: translateY(-5px); }
+    .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
+</style>
+{% endblock %}
