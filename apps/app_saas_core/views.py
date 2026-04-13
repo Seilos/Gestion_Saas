@@ -1,3 +1,6 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from app_saas_auth.models import Organization
 from app_saas_auth.forms import OrganizationForm
@@ -29,7 +32,7 @@ class OrganizationCreateView(LoginRequiredMixin, CreateView):
             return render(self.request, "core/partials/organization_success.html", {'message': self.get_context_data()['success_message']})
         return response
 
-class OrganizationUpdateView(UpdateView):
+class OrganizationUpdateView(LoginRequiredMixin, UpdateView):
     model = Organization
     form_class = OrganizationForm
     template_name = "core/partials/organization_form.html"
@@ -49,11 +52,13 @@ class OrganizationUpdateView(UpdateView):
         return response
 
 def toggle_organization_status(request, pk):
+    # Protegido manualmente para funciones sencillas
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
     org = get_object_or_404(Organization, pk=pk)
     org.is_active = not org.is_active
     org.save()
     if request.htmx:
-        # Si es HTMX, simplemente devolvemos la misma página para que la tabla se refresque
-        # o podríamos devolver solo el fragmento de la fila (más avanzado)
         return redirect('org_list')
     return redirect('org_list')
