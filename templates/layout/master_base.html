@@ -79,6 +79,13 @@
             </div>
         </div>
 
+        <div class="px-3 mt-3">
+            <form action="{% url 'logout' %}" method="post" id="logout-form" class="d-none">{% csrf_token %}</form>
+            <a href="#" onclick="document.getElementById('logout-form').submit(); return false;" class="nav-link text-danger border-0 bg-transparent ps-4 small opacity-75 hover-opacity-100">
+                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión Master
+            </a>
+        </div>
+
         <!-- Footer del Sidebar -->
         <div class="mt-auto p-3 text-center opacity-50 small">
             <p>&copy; 2026 Nexo21 Ecosystem</p>

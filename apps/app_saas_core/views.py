@@ -1,18 +1,16 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, ListView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from app_saas_auth.models import Organization
 from app_saas_auth.forms import OrganizationForm
 
-class GlobalDashboardView(TemplateView):
+class GlobalDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "core/dashboard.html"
 
-class OrganizationListView(ListView):
+class OrganizationListView(LoginRequiredMixin, ListView):
     model = Organization
     template_name = "core/organization_list.html"
     context_object_name = "organizations"
 
-class OrganizationCreateView(CreateView):
+class OrganizationCreateView(LoginRequiredMixin, CreateView):
     model = Organization
     form_class = OrganizationForm
     template_name = "core/partials/organization_form.html"

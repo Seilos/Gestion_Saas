@@ -21,7 +21,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('app_saas_core.urls')), # Dashboard principal del ecosistema
+    path('', include('app_saas_core.urls')), # Dashboard principal
+    path('auth/', include('app_saas_auth.urls')), # Sistema de identidad
 ]
 
 if settings.DEBUG:

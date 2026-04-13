@@ -108,4 +108,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'app_saas_auth.User'
 
 # CORS Settings
-CORS_ALLOW_ALL_ORIGINS = DEBUG # Solo en desarrollo
+CORS_ALLOW_ALL_ORIGINS = DEBUG 
+
+# Auth Redirects
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'global_dashboard'
+LOGOUT_REDIRECT_URL = 'login'

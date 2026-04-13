@@ -1,0 +1,18 @@
+{% extends "auth/login.html" %}
+
+{% block title %}Registro | Nexo21 Core{% endblock %}
+
+{% block content_title %}Crear Nueva Cuenta{% endblock %}
+
+{% block form_content %}
+<form method="post">
+    <!-- Simplificado para esta demostración de UI -->
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="text-white-50 small mb-2 ps-2">Nombre de Usuario</label>
+        {{ form.username }}
+    </div>
+    <!-- ... Resto del form ... -->
+    <button type="submit" class="btn btn-login w-100 mb-4">SOLICITAR ACCESO</button>
+</form>
+{% endblock %}
