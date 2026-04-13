@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     
     # Ecosistema Nexo21 Core Apps
     'app_saas_core.apps.AppSaasCoreConfig',
+    'app_saas_auth.apps.AppSaasAuthConfig',
     # 'app_saas_billing',
 ]
 
@@ -102,6 +103,9 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Modelo de Usuario Personalizado
+AUTH_USER_MODEL = 'app_saas_auth.User'
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = DEBUG # Solo en desarrollo

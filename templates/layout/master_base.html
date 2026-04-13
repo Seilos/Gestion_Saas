@@ -18,6 +18,9 @@
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
@@ -41,6 +44,20 @@
             </a>
             {% endblock %}
             
+            {% if user.role == 'super_admin' %}
+            <hr class="border-secondary opacity-25 mx-3">
+            <h6 class="ps-4 text-uppercase small opacity-50 mt-2" style="font-size: 0.65rem;">Administración Global</h6>
+            <a href="{% url 'org_list' %}" class="nav-link">
+                <i class="fas fa-building me-2 text-warning"></i> Organizaciones
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-users-cog me-2 text-warning"></i> Usuarios Globales
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-credit-card me-2 text-warning"></i> Suscripciones
+            </a>
+            {% endif %}
+
             <hr class="border-secondary opacity-25 mx-3">
 
             <!-- Configuración Global (Común a todo el ecosistema) -->
@@ -118,6 +135,26 @@
     <!-- Scripts -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     
+    {% block extra_body %}
+    <!-- MODAL GLOBAL PARA HTMX -->
+    <div class="modal fade" id="modalGlobal" tabindex="-1" aria-labelledby="modalGlobalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalGlobalLabel">Gestionar Nexo21</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
     {% block scripts %}{% endblock %}
 
     <script>
@@ -127,6 +164,37 @@
                 if(!this.getAttribute('data-bs-toggle')) {
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
+                }
+            });
+        });
+
+        // Interceptor SweetAlert2 para HTMX
+        document.body.addEventListener('htmx:confirm', function(evt) {
+            // Buscamos si el elemento tiene nuestro atributo data-confirm
+            const confirmText = evt.detail.elt.getAttribute('data-confirm');
+            
+            if (!confirmText) {
+                return;
+            }
+
+            evt.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: confirmText,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#f8f9fa',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'btn btn-warning rounded-pill px-4 fw-bold',
+                    cancelButton: 'btn btn-light rounded-pill px-4'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    evt.detail.issueRequest();
                 }
             });
         });

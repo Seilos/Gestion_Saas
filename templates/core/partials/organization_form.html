@@ -1,0 +1,29 @@
+<form hx-post="{{ form_action }}" hx-target="#modal-body" class="p-3">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label fw-bold">Nombre de la Organización</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+            <div class="text-danger small">{{ form.name.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        <label class="form-label fw-bold">Slug (URL)</label>
+        {{ form.slug }}
+        <div class="form-text small text-muted">Ej: nombre-empresa (sin espacios)</div>
+        {% if form.slug.errors %}
+            <div class="text-danger small">{{ form.slug.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="form-check form-switch mb-3">
+        {{ form.is_active }}
+        <label class="form-check-label px-2">¿Inquilino Activo?</label>
+    </div>
+    
+    <div class="modal-footer px-0 pb-0 pt-3 border-0">
+        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fas fa-save me-2"></i> {{ submit_text|default:"Guardar" }}
+        </button>
+    </div>
+</form>
