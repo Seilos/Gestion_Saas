@@ -1,0 +1,27 @@
+{
+  "name": "gestion_saas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Seilos/Gestion_Saas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Seilos/Gestion_Saas/issues"
+  },
+  "homepage": "https://github.com/Seilos/Gestion_Saas#readme",
+  "dependencies": {
+    "@powersync/web": "^1.37.1"
+  }
+}

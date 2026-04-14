@@ -22,6 +22,7 @@
                         <thead class="bg-light">
                             <tr>
                                 <th class="ps-4 border-0">Organización</th>
+                                <th class="border-0">Apps Satélites</th>
                                 <th class="border-0">Slug</th>
                                 <th class="border-0">Usuarios</th>
                                 <th class="border-0">Estado</th>
@@ -38,6 +39,22 @@
                                             <i class="fas fa-building text-info"></i>
                                         </div>
                                         <span class="fw-bold">{{ org.name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        {% for license in org.product_licenses.all %}
+                                            {% if license.is_active %}
+                                                <span class="badge rounded-pill bg-light border text-dark shadow-sm py-1 px-2" 
+                                                      data-bs-toggle="tooltip" 
+                                                      data-bs-placement="top" 
+                                                      title="{{ license.product.name }} (Plan {{ license.get_plan_type_display }})">
+                                                    <i class="{{ license.product.icon_class }} text-info small"></i>
+                                                </span>
+                                            {% endif %}
+                                        {% empty %}
+                                            <span class="text-muted small italic" style="font-size: 0.7rem;">Sin apps</span>
+                                        {% endfor %}
                                     </div>
                                 </td>
                                 <td><code>/{{ org.slug }}</code></td>

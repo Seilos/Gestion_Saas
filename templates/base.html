@@ -17,9 +17,14 @@
 <body>
 
     <nav id="sidebar">
-        <div class="logo-area">
-            <h4 class="mb-0">Clara-4 <i class="fas fa-microchip"></i></h4>
-            <small class="text-info">v1.0 - Francisco J.</small>
+        <div class="logo-area d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0">Clara-4 <i class="fas fa-microchip"></i></h4>
+                <small class="text-info">v1.0 - Francisco J.</small>
+            </div>
+            <div class="sync-status me-2">
+                <i id="sync-status-icon" class="fas fa-sync text-secondary opacity-50 small" title="Conectando con PowerSync..."></i>
+            </div>
         </div>
         
         <div class="nav flex-column mt-3">
@@ -162,6 +167,9 @@
     </main>
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    
+    <!-- Local-First PowerSync Engine (Expert 11 & 02) -->
+    <script type="module" src="{% static 'js/powersync_service.js' %}?v={{ 1|random }}"></script>
     
     {% block extra_body %}{% endblock %}
     {% block scripts %}{% endblock %}

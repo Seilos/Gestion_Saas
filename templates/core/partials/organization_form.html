@@ -1,29 +1,88 @@
 <form hx-post="{{ form_action }}" hx-target="#modal-body" class="p-3">
     {% csrf_token %}
-    <div class="mb-3">
-        <label class="form-label fw-bold">Nombre de la Organización</label>
-        {{ form.name }}
-        {% if form.name.errors %}
-            <div class="text-danger small">{{ form.name.errors }}</div>
-        {% endif %}
+    <div class="row">
+        <div class="col-md-7 mb-3">
+            <label class="form-label fw-bold small text-muted text-uppercase">Nombre del Cliente</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="text-danger small">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-5 mb-3">
+            <label class="form-label fw-bold small text-muted text-uppercase">Slug / Identificador</label>
+            {{ form.slug }}
+            {% if form.slug.errors %}
+                <div class="text-danger small">{{ form.slug.errors }}</div>
+            {% endif %}
+        </div>
     </div>
-    <div class="mb-3">
-        <label class="form-label fw-bold">Slug (URL)</label>
-        {{ form.slug }}
-        <div class="form-text small text-muted">Ej: nombre-empresa (sin espacios)</div>
-        {% if form.slug.errors %}
-            <div class="text-danger small">{{ form.slug.errors }}</div>
-        {% endif %}
+
+    <div class="card bg-light border-0 mb-3" style="border-radius: 15px;">
+        <div class="card-body">
+            <label class="form-label fw-bold text-dark mb-3">
+                <i class="fas fa-plug text-warning me-2"></i> Apps Satélites a Vincular
+            </label>
+            <div class="product-selection-grid">
+                {% for choice in form.products %}
+                <div class="product-item mb-2">
+                    <div class="form-check custom-card-check">
+                        {{ choice.tag }}
+                        <label class="form-check-label d-flex align-items-center" for="{{ choice.id_for_label }}">
+                            <span class="ms-2">{{ choice.choice_label }}</span>
+                        </label>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-3">
+                    <p class="text-muted small mb-0">No hay productos activos para vincular.</p>
+                    <a href="{% url 'product_list' %}" class="small text-info">Configurar productos primero</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <div class="form-check form-switch mb-3">
+
+    <div class="form-check form-switch custom-switch mb-3">
         {{ form.is_active }}
-        <label class="form-check-label px-2">¿Inquilino Activo?</label>
+        <label class="form-check-label fw-bold px-2">Organización Activa</label>
     </div>
     
     <div class="modal-footer px-0 pb-0 pt-3 border-0">
-        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
         <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
             <i class="fas fa-save me-2"></i> {{ submit_text|default:"Guardar" }}
         </button>
     </div>
 </form>
+
+<style>
+    .product-selection-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .custom-card-check {
+        background: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        transition: all 0.2s;
+    }
+    .custom-card-check:hover {
+        border-color: #ffc107;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+</style>
+
+<script>
+    // Autofill slug
+    document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+        const slugInput = document.querySelector('input[name="slug"]');
+        if (slugInput) {
+            slugInput.value = e.target.value
+                .toLowerCase()
+                .replace(/[^\w ]+/g, '')
+                .replace(/ +/g, '-');
+        }
+    });
+</script>

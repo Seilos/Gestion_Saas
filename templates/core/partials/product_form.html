@@ -1,0 +1,66 @@
+<form hx-post="{{ form_action }}" hx-target="#modal-body" class="p-3">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-7 mb-3">
+            <label class="form-label fw-bold">Nombre del Producto</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="text-danger small">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-5 mb-3">
+            <label class="form-label fw-bold">Slug</label>
+            {{ form.slug }}
+            {% if form.slug.errors %}
+                <div class="text-danger small">{{ form.slug.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Descripción Corta</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+            <div class="text-danger small">{{ form.description.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="row align-items-end">
+        <div class="col-md-8 mb-3">
+            <label class="form-label fw-bold">Icono (FontAwesome Class)</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3">
+                    <i class="fas fa-icons text-muted"></i>
+                </span>
+                {{ form.icon_class }}
+            </div>
+            <div class="form-text small">Ej: fas fa-store</div>
+        </div>
+        <div class="col-md-4 mb-3 pb-2">
+            <div class="form-check form-switch custom-switch">
+                {{ form.is_active }}
+                <label class="form-check-label fw-bold px-2">Activo</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-footer px-0 pb-0 pt-3 border-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+        <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fas fa-rocket me-2"></i> {{ submit_text|default:"Registrar Producto" }}
+        </button>
+    </div>
+</form>
+
+<script>
+    // Lógica simple para sugerir slug desde el nombre
+    document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+        const slugInput = document.querySelector('input[name="slug"]');
+        if (slugInput && !slugInput.dataset.manual) {
+            slugInput.value = e.target.value
+                .toLowerCase()
+                .replace(/[^\w ]+/g, '')
+                .replace(/ +/g, '-');
+        }
+    });
+</script>

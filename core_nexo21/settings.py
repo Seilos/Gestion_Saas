@@ -70,12 +70,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core_nexo21.wsgi.application'
 
 # Database
-# Por ahora usamos SQLite, preparado para cambiar vía .env en producción
+# Sistema híbrido: Usa Supabase si DATABASE_URL está configurado, si no, usa SQLite
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Password validation
