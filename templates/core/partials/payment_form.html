@@ -1,0 +1,80 @@
+<form hx-post="{{ form_action }}" hx-target="#modal-body" class="p-3">
+    {% csrf_token %}
+    
+    <div class="alert alert-info border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-white p-2 me-3">
+                <i class="{{ license.product.icon_class }} text-info"></i>
+            </div>
+            <div>
+                <small class="text-uppercase fw-bold text-muted d-block" style="font-size: 0.65rem;">Registrar Cobro para:</small>
+                <span class="fw-bold">{{ license.organization.name }}</span> — {{ license.product.name }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold small text-muted">Monto (USD)</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3">$</span>
+                {{ form.amount_usd }}
+            </div>
+            {% if form.amount_usd.errors %}<div class="text-danger small">{{ form.amount_usd.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold small text-muted">Tasa BCV</label>
+            {{ form.exchange_rate }}
+            {% if form.exchange_rate.errors %}<div class="text-danger small">{{ form.exchange_rate.errors }}</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold small text-muted">Equivalencia en Bolívares (Calculado)</label>
+        <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3">Bs.</span>
+            {{ form.amount_ves }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold small text-muted">Método de Pago</label>
+            {{ form.method }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold small text-muted">Referencia</label>
+            {{ form.reference }}
+            {% if form.reference.errors %}<div class="text-danger small">{{ form.reference.errors }}</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold small text-muted">Notas Adicionales</label>
+        {{ form.notes }}
+    </div>
+
+    <div class="modal-footer px-0 pb-0 pt-3 border-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fas fa-cash-register me-2"></i> Procesar Cobro
+        </button>
+    </div>
+</form>
+
+<script>
+    function calculateBS() {
+        const usd = parseFloat(document.querySelector('input[name="amount_usd"]').value) || 0;
+        const rate = parseFloat(document.querySelector('input[name="exchange_rate"]').value) || 0;
+        const bsInput = document.querySelector('input[name="amount_ves"]');
+        if (bsInput) {
+            bsInput.value = (usd * rate).toFixed(2);
+        }
+    }
+
+    document.querySelector('input[name="amount_usd"]').addEventListener('input', calculateBS);
+    document.querySelector('input[name="exchange_rate"]').addEventListener('input', calculateBS);
+    
+    // Ejecutar inicial
+    calculateBS();
+</script>

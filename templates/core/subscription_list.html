@@ -1,0 +1,127 @@
+{% extends "layout/master_base.html" %}
+
+{% block title %}Suscripciones | Nexo21 Core{% endblock %}
+
+{% block page_title %}Gestión de Contratos y Licencias{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <!-- Métricas Rápidas -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6 class="text-muted small text-uppercase">Licencias Activas</h6>
+                    <h3 class="fw-bold mb-0">{{ subscriptions.count }}</h3>
+                </div>
+                <div class="rounded-circle bg-success-soft p-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h6 class="text-muted small text-uppercase">Por Vencer (30d)</h6>
+                    <h3 class="fw-bold mb-0">{% block expiring_count %}0{% endblock %}</h3>
+                </div>
+                <div class="rounded-circle bg-warning-soft p-3">
+                    <i class="fas fa-hourglass-half text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius: 15px;">
+    <div class="card-header bg-white border-0 py-3">
+        <h5 class="mb-0 fw-bold text-dark">Maestro de Suscripciones</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 border-0">Organización / Cliente</th>
+                        <th class="border-0">Producto Satélite</th>
+                        <th class="border-0">Plan</th>
+                        <th class="border-0">Vencimiento</th>
+                        <th class="border-0 text-center">Estado</th>
+                        <th class="pe-4 border-0 text-end">Acciones Maestro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subscriptions %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-bold">{{ sub.organization.name }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light border text-dark px-3 py-2 shadow-xs">
+                                <i class="{{ sub.product.icon_class }} text-info me-2"></i> {{ sub.product.name }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong class="text-uppercase small">{{ sub.get_plan_type_display }}</strong>
+                        </td>
+                        <td>
+                            {% if sub.expires_at %}
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">{{ sub.expires_at|date:"d/m/Y" }}</span>
+                                    <small class="text-muted" style="font-size: 0.7rem;">{{ sub.expires_at|timeuntil }} restantes</small>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Sin límite</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if sub.is_active %}
+                                <span class="badge bg-success-soft text-success rounded-pill px-3">Suscrito</span>
+                            {% else %}
+                                <span class="badge bg-danger-soft text-danger rounded-pill px-3">Inactivo / Pausado</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <!-- ACCIONES RÁPIDAS -->
+                            <div class="btn-group shadow-sm" style="border-radius: 20px; overflow: hidden;">
+                                <button class="btn btn-white btn-sm border-end" title="Renovar +30 días"
+                                        hx-post="{% url 'license_renew' sub.pk %}" hx-target="body"
+                                        data-confirm="¿Extender la suscripción de {{ sub.organization.name }} por 30 días adicionales?">
+                                    <i class="fas fa-calendar-plus text-success"></i>
+                                </button>
+                                <button class="btn btn-white btn-sm border-end" title="Registrar Pago"
+                                        data-bs-toggle="modal" data-bs-target="#modalGlobal"
+                                        hx-get="{% url 'payment_create' sub.pk %}" hx-target="#modal-body">
+                                    <i class="fas fa-dollar-sign text-primary"></i>
+                                </button>
+                                <button class="btn btn-white btn-sm" title="{% if sub.is_active %}Pausar{% else %}Activar{% endif %}"
+                                        hx-post="{% url 'license_toggle' sub.pk %}" hx-target="body">
+                                    <i class="fas fa-power-off {% if sub.is_active %}text-danger{% else %}text-success{% endif %}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No se han emitido licencias de productos aún.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
+    .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
+    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1); }
+    .btn-white { background: #fff; }
+    .btn-white:hover { background: #f8f9fa; }
+</style>
+{% endblock %}

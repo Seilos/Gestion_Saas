@@ -101,3 +101,47 @@ class ProductLicense(BaseModel):
 
     def __str__(self):
         return f"{self.organization.name} -> {self.product.name} ({self.plan_type})"
+
+class Payment(BaseModel):
+    """
+    REGISTRO MAESTRO DE INGRESOS:
+    Soporta pagos manuales del admin y automáticos de apps externas.
+    """
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="payments")
+    license = models.ForeignKey(ProductLicense, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
+    
+    # Montos y Monedas
+    amount_usd = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Monto en USD")
+    exchange_rate = models.DecimalField(max_digits=12, decimal_places=4, verbose_name="Tasa de Cambio (BCV)")
+    amount_ves = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Monto en Bolívares")
+    
+    # Detalles de la Transacción
+    PAYMENT_METHODS = (
+        ('pago_movil', 'Pago Móvil'),
+        ('zelle', 'Zelle'),
+        ('binance', 'Binance Pay'),
+        ('cash', 'Efectivo'),
+        ('transfer', 'Transferencia'),
+    )
+    method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='pago_movil')
+    reference = models.CharField(max_length=100, help_text="ID de transacción / Referencia")
+    
+    # Estado y Auditoría
+    status = models.CharField(max_length=20, default='completed', choices=(
+        ('pending', 'Verificación Pendiente'),
+        ('completed', 'Cargado con Éxito'),
+        ('failed', 'Rechazado'),
+        ('voided', 'Anulado')
+    ))
+    # Saber qué App Orquestada envió el cobro (si fue automático)
+    source_product = models.ForeignKey(SaaSProduct, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    notes = models.TextField(blank=True, verbose_name="Notas de Auditoría")
+
+    class Meta:
+        verbose_name = "Cobro / Pago"
+        verbose_name_plural = "Cobros / Pagos"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.organization.name} - ${self.amount_usd} ({self.get_status_display()})"

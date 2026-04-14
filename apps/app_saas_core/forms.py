@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from app_saas_auth.models import Organization
-from .models import SaaSProduct, ProductLicense
+from .models import SaaSProduct, ProductLicense, Payment
 
 class SaaSProductForm(forms.ModelForm):
     class Meta:
@@ -63,3 +63,16 @@ class OrganizationWithProductsForm(forms.ModelForm):
                 license.deleted_by = None
                 license.is_active = True
                 license.save()
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['amount_usd', 'exchange_rate', 'amount_ves', 'method', 'reference', 'notes']
+        widgets = {
+            'amount_usd': forms.NumberInput(attrs={'class': 'form-control rounded-pill px-4', 'placeholder': '0.00', 'step': '0.01'}),
+            'exchange_rate': forms.NumberInput(attrs={'class': 'form-control rounded-pill px-4', 'placeholder': 'Tasa BCV', 'step': '0.01'}),
+            'amount_ves': forms.NumberInput(attrs={'class': 'form-control rounded-pill px-4 bg-light', 'placeholder': 'Monto en Bs.', 'readonly': 'readonly'}),
+            'method': forms.Select(attrs={'class': 'form-select rounded-pill px-4'}),
+            'reference': forms.TextInput(attrs={'class': 'form-control rounded-pill px-4', 'placeholder': 'Ref / Confirmación'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control rounded-3 px-4', 'rows': 2, 'placeholder': 'Observaciones adicionales...'}),
+        }
