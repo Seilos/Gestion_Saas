@@ -30,12 +30,17 @@
             <h4 class="mb-0">Nexo21 <i class="fas fa-layer-group text-info"></i></h4>
             <small class="text-info">Core Orchestrator v1.0</small>
         </div>
+
+        <div id="sync-status" class="py-3 d-flex justify-content-center align-items-center gap-2 opacity-100" style="font-size: 0.70rem;">
+            <i id="sync-status-icon" class="fas fa-sync-alt fa-spin text-info" style="filter: drop-shadow(0 0 5px #17a2b8);"></i>
+            <span id="sync-status-text" class="text-white-50">Conectando Nexus...</span>
+        </div>
         
-        <div class="nav flex-column mt-3">
+        <div class="nav flex-column">
             <!-- App Selector (Opcional) -->
             {% block app_selector %}{% endblock %}
 
-            <hr class="border-secondary opacity-25 mx-3">
+            <hr class="border-secondary opacity-25 mx-3 m-0">
 
             <!-- Menú Principal de la App Activa -->
             {% block sidebar_menu %}
@@ -163,6 +168,9 @@
     </div>
     {% endblock %}
     {% block scripts %}{% endblock %}
+    
+    <!-- Local-First PowerSync Engine (Expert 11) -->
+    <script type="module" src="{% static 'js/powersync_service.js' %}?v=1.0.6"></script>
 
     <script>
         // Lógica de navegación active
