@@ -1,4 +1,5 @@
 {% extends "layout/master_base.html" %}
+{% load core_tags %}
 
 {% block title %}Suscripciones | Nexo21 Core{% endblock %}
 
@@ -12,7 +13,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <h6 class="text-muted small text-uppercase">Licencias Activas</h6>
-                    <h3 class="fw-bold mb-0">{{ subscriptions.count }}</h3>
+                    <h3 class="fw-bold mb-0">{{ active_count }}</h3>
                 </div>
                 <div class="rounded-circle bg-success-soft p-3">
                     <i class="fas fa-check-circle text-success"></i>
@@ -24,8 +25,8 @@
         <div class="card border-0 shadow-sm p-3" style="border-radius: 15px;">
             <div class="d-flex justify-content-between">
                 <div>
-                    <h6 class="text-muted small text-uppercase">Por Vencer (30d)</h6>
-                    <h3 class="fw-bold mb-0">{% block expiring_count %}0{% endblock %}</h3>
+                    <h6 class="text-muted small text-uppercase">Por Vencer (7D)</h6>
+                    <h3 class="fw-bold mb-0">{{ expiring_7d_count }}</h3>
                 </div>
                 <div class="rounded-circle bg-warning-soft p-3">
                     <i class="fas fa-hourglass-half text-warning"></i>
@@ -64,13 +65,30 @@
                             </span>
                         </td>
                         <td>
-                            <strong class="text-uppercase small">{{ sub.get_plan_type_display }}</strong>
+                            <strong class="text-uppercase small text-primary">
+                                {% if sub.plan %}
+                                    {{ sub.plan.name }}
+                                {% else %}
+                                    <span class="text-muted">S/N</span>
+                                {% endif %}
+                            </strong>
                         </td>
                         <td>
                             {% if sub.expires_at %}
                                 <div class="d-flex flex-column">
                                     <span class="fw-bold">{{ sub.expires_at|date:"d/m/Y" }}</span>
-                                    <small class="text-muted" style="font-size: 0.7rem;">{{ sub.expires_at|timeuntil }} restantes</small>
+                                    {% with left=sub.expires_at|remaining_days %}
+                                        <small class="{% if left < 5 %}text-danger fw-bold text-uppercase{% else %}text-muted{% endif %}" style="font-size: 0.7rem;">
+                                            {% if left < 0 %}
+                                                Vencido ({{ left|absolute }} días)
+                                            {% elif left == 0 %}
+                                                Vence hoy
+                                            {% else %}
+                                                {{ left }} 
+                                                {% if left == 1 %}día{% else %}días{% endif %} restantes
+                                            {% endif %}
+                                        </small>
+                                    {% endwith %}
                                 </div>
                             {% else %}
                                 <span class="text-muted">Sin límite</span>

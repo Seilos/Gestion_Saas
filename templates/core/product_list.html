@@ -58,6 +58,11 @@
                                 </td>
                                 <td class="small text-muted">{{ product.created_at|date:"d/M/Y" }}</td>
                                 <td class="pe-4 text-end">
+                                    <button class="btn btn-light btn-sm rounded-circle shadow-sm me-2" title="Configurar Planes"
+                                            hx-get="{% url 'plan_list' product.pk %}" hx-target="#modal-body"
+                                            data-bs-toggle="modal" data-bs-target="#modalGlobal">
+                                        <i class="fas fa-cog text-muted"></i>
+                                    </button>
                                     <button class="btn btn-light btn-sm rounded-circle shadow-sm me-2" title="Editar"
                                             data-bs-toggle="modal" data-bs-target="#modalGlobal"
                                             hx-get="{% url 'product_update' product.pk %}" hx-target="#modal-body">

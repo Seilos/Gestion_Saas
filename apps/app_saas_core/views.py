@@ -4,8 +4,8 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from app_saas_auth.models import Organization
-from .models import SaaSProduct, ProductLicense, Payment
-from .forms import SaaSProductForm, OrganizationWithProductsForm, PaymentForm
+from .models import SaaSProduct, ProductLicense, Payment, ProductPlan
+from .forms import SaaSProductForm, OrganizationWithProductsForm, PaymentForm, ProductPlanForm
 
 # --- DASHBOARD ---
 class GlobalDashboardView(LoginRequiredMixin, TemplateView):
@@ -35,7 +35,7 @@ class OrganizationCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        form.save_licenses(self.object, self.request.user)
+        form.save_licenses(self.object, self.request.user, self.request.POST)
         if self.request.htmx:
             return render(self.request, "core/partials/organization_success.html", {'message': self.get_context_data()['success_message']})
         return response
@@ -55,7 +55,7 @@ class OrganizationUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        form.save_licenses(self.object, self.request.user)
+        form.save_licenses(self.object, self.request.user, self.request.POST)
         if self.request.htmx:
             return render(self.request, "core/partials/organization_success.html", {'message': self.get_context_data()['success_message']})
         return response
@@ -146,18 +146,45 @@ class SubscriptionListView(LoginRequiredMixin, ListView):
     context_object_name = "subscriptions"
 
     def get_queryset(self):
-        return ProductLicense.objects.filter(deleted_at__isnull=True).select_related('organization', 'product').order_by('expires_at')
+        return ProductLicense.objects.filter(deleted_at__isnull=True).select_related('organization', 'product', 'plan').order_by('expires_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.utils import timezone
+        now = timezone.now()
+        next_week = now + timezone.timedelta(days=7)
+        
+        # Licencias que vencen en los próximos 7 días (y que no sean ilimitadas)
+        context['expiring_7d_count'] = ProductLicense.objects.filter(
+            deleted_at__isnull=True,
+            is_active=True,
+            expires_at__gt=now,
+            expires_at__lte=next_week
+        ).count()
+        
+        # Licencias activas totales
+        context['active_count'] = ProductLicense.objects.filter(
+            deleted_at__isnull=True,
+            is_active=True
+        ).count()
+        
+        return context
 
 def renew_license(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
     
     license = get_object_or_404(ProductLicense, pk=pk)
-    # Extender 30 días desde hoy o desde el vencimiento si es futuro
-    base_date = license.expires_at if license.expires_at and license.expires_at > timezone.now() else timezone.now()
-    from datetime import timedelta
-    license.expires_at = base_date + timedelta(days=30)
-    license.is_active = True
+    if not license.plan or license.plan.duration_days == 0:
+        # Si es ilimitado, no hace falta renovar, pero nos aseguramos que esté activo
+        license.is_active = True
+        license.expires_at = None
+    else:
+        # Sumar la duración del plan
+        base_date = license.expires_at if license.expires_at and license.expires_at > timezone.now() else timezone.now()
+        license.expires_at = base_date + timezone.timedelta(days=license.plan.duration_days)
+        license.is_active = True
+    
     license.updated_by = request.user
     license.save()
     
@@ -208,9 +235,61 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
         form.instance.organization = license.organization
         form.instance.license = license
         form.instance.created_by = self.request.user
+        
+        # --- LÓGICA DE RENOVACIÓN AUTOMÁTICA AL COBRAR ---
+        if license.plan and license.plan.duration_days > 0:
+            base_date = license.expires_at if license.expires_at and license.expires_at > timezone.now() else timezone.now()
+            license.expires_at = base_date + timezone.timedelta(days=license.plan.duration_days)
+            license.is_active = True
+            license.save()
+        elif license.plan and license.plan.duration_days == 0:
+            license.expires_at = None
+            license.is_active = True
+            license.save()
+
         response = super().form_valid(form)
         if self.request.htmx:
             return render(self.request, "core/partials/organization_success.html", {
                 'message': f"¡Cobro de ${form.instance.amount_usd} registrado con éxito!"
             })
         return response
+
+# --- GESTIÓN DE PLANES ---
+
+class ProductPlanListView(LoginRequiredMixin, ListView):
+    model = ProductPlan
+    template_name = "core/plan_list.html"
+    context_object_name = "plans"
+
+    def get_queryset(self):
+        product_id = self.kwargs.get('product_id')
+        return ProductPlan.objects.filter(product_id=product_id, deleted_at__isnull=True).order_by('price_usd')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = get_object_or_404(SaaSProduct, pk=self.kwargs.get('product_id'))
+        return context
+
+class ProductPlanCreateView(LoginRequiredMixin, CreateView):
+    model = ProductPlan
+    form_class = ProductPlanForm
+    template_name = "core/partials/plan_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_id = self.kwargs.get('product_id')
+        context['product'] = get_object_or_404(SaaSProduct, pk=product_id)
+        context['form_action'] = reverse_lazy('plan_create', kwargs={'product_id': product_id})
+        return context
+
+    def form_valid(self, form):
+        product_id = self.kwargs.get('product_id')
+        form.instance.product = get_object_or_404(SaaSProduct, pk=product_id)
+        form.instance.created_by = self.request.user
+        response = super().form_valid(form)
+        if self.request.htmx:
+            return redirect('plan_list', product_id=product_id)
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('plan_list', kwargs={'product_id': self.kwargs.get('product_id')})

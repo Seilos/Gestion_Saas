@@ -67,16 +67,31 @@ class SaaSProduct(BaseModel):
     def __str__(self):
         return self.name
 
+class ProductPlan(BaseModel):
+    """
+    DEFINICIÓN DE PLANES:
+    Cada producto puede tener múltiples planes (Gratis, Pro, etc.)
+    """
+    product = models.ForeignKey(SaaSProduct, on_delete=models.CASCADE, related_name="plans")
+    name = models.CharField(max_length=50, verbose_name="Nombre del Plan")
+    description = models.TextField(blank=True)
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    duration_days = models.IntegerField(default=30, help_text="Duración en días. 0 para ilimitado/lifetime.")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Plan de Producto"
+        verbose_name_plural = "Planes de Productos"
+
+    def __str__(self):
+        return f"{self.product.name} - {self.name} (${self.price_usd})"
+
 class ProductLicense(BaseModel):
-    """
-    CONTROL DE ACCESO (Licencias):
-    Relaciona a tus Organizaciones (Clientes) con tus Productos.
-    """
     organization = models.ForeignKey(
         Organization, 
         on_delete=models.CASCADE, 
         related_name="product_licenses",
-        verbose_name="Cliente/Organización"
+        verbose_name="Organización"
     )
     product = models.ForeignKey(
         SaaSProduct, 
@@ -84,15 +99,19 @@ class ProductLicense(BaseModel):
         related_name="active_licenses",
         verbose_name="Producto Contratado"
     )
+    plan = models.ForeignKey(
+        ProductPlan, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="licenses",
+        verbose_name="Plan Actual"
+    )
     
     expires_at = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Vencimiento")
     
-    PLAN_LEVELS = (
-        ('free', 'Gratuito'),
-        ('pro', 'Profesional'),
-        ('enterprise', 'Enterprise'),
-    )
-    plan_type = models.CharField(max_length=20, choices=PLAN_LEVELS, default='free')
+    # Mantenemos plan_type como fallback o legacy
+    plan_type = models.CharField(max_length=20, default='free', blank=True)
 
     class Meta:
         unique_together = ('organization', 'product')
@@ -100,7 +119,7 @@ class ProductLicense(BaseModel):
         verbose_name_plural = "Licencias de Productos"
 
     def __str__(self):
-        return f"{self.organization.name} -> {self.product.name} ({self.plan_type})"
+        return f"{self.organization.name} -> {self.product.name} ({self.plan.name if self.plan else self.plan_type})"
 
 class Payment(BaseModel):
     """
@@ -109,6 +128,7 @@ class Payment(BaseModel):
     """
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="payments")
     license = models.ForeignKey(ProductLicense, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
+    plan = models.ForeignKey(ProductPlan, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments_applied")
     
     # Montos y Monedas
     amount_usd = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Monto en USD")
