@@ -8,14 +8,14 @@ Para garantizar un proyecto escalable y mantenible (ya sea en Python/Django, Nod
 
 ### A. Estructura de Directorios Modular
 ```text
-project_root/
-├── config/              # Configuraciones globales (Database, Env variables, Auth)
-├── apps/modules/        # Lógica de negocio segmentada (Users, Billing, Core Domain)
-├── presentation/        # UI/Templates (Separado de la lógica de negocio)
-├── common/shared/       # Utilidades, decoradores, validaciones globales
-├── static/              # Assets estáticos (Bootstrap, Custom CSS, JS, Media)
-├── templates/layout/    # Estructura base de la interfaz
-└── docs/                # Documentación técnica y guía de API
+project_root/ (Ecosistema / Monorepo)
+├── apps/                # Aplicaciones del Panel Central (Orquestador)
+├── services/            # Microservicios DaaS/SaaS independientes (ej: api_bcv)
+│   └── api_bcv/         # Proyecto independiente con su propia BD y .env
+├── common/shared/       # Utilidades globales (si aplica)
+├── static/              # Assets estáticos (Bootstrap, Custom CSS, JS)
+├── templates/layout/    # Plantillas UI del Panel Principal
+└── docs/                # Documentación técnica y logs
 ```
 
 ### B. Filosofía de Desarrollo
