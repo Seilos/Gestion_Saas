@@ -22,3 +22,5 @@ env/
 .vscode/
 .idea/
 node_modules
+supabase_clarapos_nodejs/
+dev_data_backup*.json
