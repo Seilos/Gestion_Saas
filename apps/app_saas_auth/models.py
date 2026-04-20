@@ -11,6 +11,11 @@ class Organization(models.Model):
     slug = models.SlugField(unique=True, help_text="Identificador único para la URL o subdominios")
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    clarapos_tenant_id = models.UUIDField(
+        null=True, blank=True,
+        verbose_name="Tenant ID en ClaraPOS",
+        help_text="UUID del tenant_id asociado en la base de datos de ClaraPOS"
+    )
 
     def __str__(self):
         return self.name

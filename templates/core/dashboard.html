@@ -22,12 +22,14 @@
                     <small class="text-muted text-uppercase">Usuarios Activos</small>
                 </div>
                 <div class="col-6 col-md-3 text-center border-end">
-                    <h2 class="fw-bold text-primary">$450</h2>
-                    <small class="text-muted text-uppercase">Recaudado (Mes)</small>
+                    <h2 class="fw-bold text-primary">${{ mrr|default:"0.00" }}</h2>
+                    <small class="text-muted text-uppercase">MRR / Mes</small>
                 </div>
                 <div class="col-6 col-md-3 text-center">
-                    <h2 class="fw-bold text-warning">24.50</h2>
-                    <small class="text-muted text-uppercase">Tasa BCV</small>
+                    <h2 class="fw-bold text-warning" id="bcv-rate-display">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    </h2>
+                    <small class="text-muted text-uppercase">Tasa BCV <span id="bcv-rate-badge"></span></small>
                 </div>
             </div>
         </div>
@@ -43,7 +45,7 @@
                         hx-get="{% url 'org_create' %}" hx-target="#modal-body">
                     <i class="fas fa-plus me-2 text-warning"></i> Crear Nuevo Inquilino
                 </button>
-                <button class="btn btn-outline-light btn-sm text-start"><i class="fas fa-file-invoice-dollar me-2"></i> Reporte de Cobros</button>
+                <a href="{% url 'payment_report' %}" class="btn btn-outline-light btn-sm text-start"><i class="fas fa-file-invoice-dollar me-2"></i> Reporte de Cobros</a>
                 <button class="btn btn-outline-light btn-sm text-start"><i class="fas fa-shield-alt me-2"></i> Auditoría de Seguridad</button>
             </div>
         </div>
@@ -109,4 +111,31 @@
     .hover-grow:hover { transform: translateY(-5px); }
     .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
 </style>
+
+<script>
+(function fetchBcvRate() {
+    fetch('http://127.0.0.1:8081/api/rates/bcv/latest', { signal: AbortSignal.timeout(3000) })
+        .then(r => r.json())
+        .then(data => {
+            const display = document.getElementById('bcv-rate-display');
+            const badge   = document.getElementById('bcv-rate-badge');
+            if (data.success) {
+                const val = parseFloat(data.value).toFixed(2);
+                display.textContent = 'Bs. ' + val;
+                const cached = data.date_text && data.date_text.includes('Caché');
+                badge.innerHTML = cached
+                    ? '<span class="badge bg-secondary ms-1" style="font-size:.6rem;">caché</span>'
+                    : '<span class="badge bg-success ms-1" style="font-size:.6rem;">live</span>';
+            } else {
+                display.textContent = 'N/A';
+                badge.innerHTML = '<span class="badge bg-danger ms-1" style="font-size:.6rem;">offline</span>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('bcv-rate-display').textContent = '—';
+            document.getElementById('bcv-rate-badge').innerHTML =
+                '<span class="badge bg-secondary ms-1" style="font-size:.6rem;">API offline</span>';
+        });
+})();
+</script>
 {% endblock %}

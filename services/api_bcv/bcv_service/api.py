@@ -20,10 +20,23 @@ class RateResponse(Schema):
 def get_latest_bcv_rate(request):
     """
     Obtiene la última tasa del BCV en tiempo real.
-    Si ya se escrapeó en la última hora, puede devolver desde la caché de la BD (para futuro).
-    Por ahora, extrae directamente de la web o de la BD si la web falla.
+    Intenta obtener desde la caché de la BD si ya se guardó hoy, para evitar bloqueos por exceso de peticiones.
+    Si no, extrae directamente de la web o del último registro disponible si la web falla.
     """
-    # Intentar obtener de la web
+    today = timezone.now().date()
+    
+    # 1. Retornar caché de hoy si existe
+    cached_rate = ExchangeRate.objects.filter(source="BCV", is_active=True, fecha_valor=today).order_by('-fetched_at').first()
+    if cached_rate:
+        return {
+            "source": "BCV",
+            "value": cached_rate.value,
+            "date_text": "Caché de Base de Datos (Hoy)",
+            "fetched_at": cached_rate.fetched_at.isoformat(),
+            "success": True
+        }
+
+    # 2. Si no hay caché, intentar obtener de la web
     result = parse_bcv_rate()
     
     if result.get("success"):

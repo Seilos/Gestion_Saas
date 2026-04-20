@@ -1,46 +1,53 @@
-# 📑 Log de Sesión: 19 de Abril, 2026 (Transición a Monorepo y API BCV)
-## Proyecto: Ecosistema Nexo21 — Orquestador SaaS + DaaS
+# 📑 Log de Sesión: 19 de Abril, 2026 (Consolidación SaaS e Integración ClaraPOS)
+## Proyecto: Ecosistema Nexo21 — Orquestador SaaS + DaaS + ERP
 
 ### 📝 Resumen Ejecutivo
-En esta sesión, la arquitectura del proyecto evolucionó de un sistema monolítico a una infraestructura orientada a servicios (SOA / Monorepo). Se detectó la necesidad de utilizar la tasa del BCV no solo para el panel administrativo, sino también para futuras herramientas independientes (ERP, sitios como DolarVzla, etc.). Por tanto, se desarrolló un microservicio dedicado e independiente llamado **API BCV**, que cuenta con su propia configuración de base de datos aislada para garantizar seguridad y escalabilidad masiva.
+Esta sesión avanzó en dos frentes críticos: la estabilización y finalización del microservicio de la tasa BCV, y el diseño e implementación de la arquitectura de License Gateway para interconectar el Orquestador Nexo21 con un producto satélite real en desarrollo: **ClaraPOS** (un ERP multi-tenant construido en Node.js y Supabase). Logramos analizar las Edge Functions reales de ClaraPOS, confirmar su esquema de base de datos multi-tenant y aplicar los campos necesarios en Nexo21 para realizar una sincronización robusta sin modificar el código legacy de ClaraPOS y sin pedir tokens tipo `service_role`.
 
 ---
 
 ### ✅ Hitos de la Sesión
-1.  **Refactorización de Lanzadores**: Se optimizó agresivamente el archivo `run_nexo21.bat`, implementando vigilancia de puertos asíncrona, cierre preventivo de procesos conflictivos en el puerto `8080` y garantizando que la consola de desarrollo jamás se cierre de forma inesperada (uso de `cmd /k`).
-2.  **Arquitectura Monorepo**: Creación de la carpeta `services/` para alojar aplicaciones/APIs secundarias que comparten el entorno de desarrollo local pero poseen repositorios de datos independientes.
-3.  **Desarrollo del Scraper (Web Scraping)**: Implementación de la capa de extracción de datos usando `BeautifulSoup4`. El script simula un navegador legítimo y es capaz de parsear el DOM del portal oficial del Banco Central de Venezuela.
-4.  **Despliegue del Microservicio de Datos (DaaS)**:
-    *   Nuevo proyecto Django Ninja alojado en `services/api_bcv`.
-    *   Archivo `.env` autónomo preparado para conectar con una instancia secundaria de Supabase (Cuenta B).
-    *   Endpoint `GET /api/rates/bcv/latest` funcional.
-5.  **Ejecución Dual (Concurrencia)**: Integración con éxito de los comandos de inicio rápido. El Panel Orquestador opera en `http://127.0.0.1:8080` y la API BCV en `http://127.0.0.1:8081` de manera simultánea.
+1. **Consolidación de API BCV & Orquestador**:
+   * Implementada la caché histórica en la base de datos de BCV para no hacer scraping redundante.
+   * Agregado middleware de CORS para permitir solicitudes GET/OPTIONS desde `127.0.0.1:8080`.
+   * Integración en el Orquestador: El dashboard ahora presenta un Widget BCV tipo *Live* (fetch directo a `:8081`) que soporta estados Offline sin romper la página.
+2. **Dashboard y Finanzas**:
+   * Implementada la vista "Reporte de Cobros" (`/cobros/`) con KPIs de ingresos históricos y mensuales, además de tabla detallada de pagos.
+   * `GlobalDashboardView` ahora calcula en vivo el Ingreso Recurrente Mensual (MRR).
+3. **Gateway de Licencias Inter-servicios**:
+   * Se creó `ServiceAPIKey` en Django y quedó expuesto el endpoint `/api/gateway/license/check/` protegido por `X-Service-Key`.
+4. **Diseño de Integración Definitiva con ClaraPOS**:
+   * Analizado a profundidad el código base de ClaraPOS (Node.js/Supabase Edge Functions).
+   * **Arquitectura validada**: Nexo21 creará el tenant base enviando una petición HTTP a le edge function `register-owner` de ClaraPOS.
+   * Se agregó y migró el campo `clarapos_tenant_id` al modelo `Organization` en Nexo21.
+   * Creado el script intermedio `clarapos_sync.py` que ejecutará las llamadas REST estructuradas.
 
 ---
 
 ### 📂 Archivos Modificados/Creados
 | Archivo | Función |
 |---|---|
-| `run_nexo21.bat` | Script de inicialización robusto y persistente para el panel. |
-| `services/api_bcv/run_api.bat` | Script de inicialización del microservicio BCV. |
-| `services/api_bcv/bcv_service/scraper.py` | Motor de scraping y parseo de string a Decimal. |
-| `services/api_bcv/bcv_service/api.py` | Definición de endpoints REST usando Django Ninja. |
-| `services/api_bcv/bcv_service/models.py` | Tabla para caché histórico de tasas monetarias. |
-| `.ai_experts/00_project_roadmap.md` | Actualizado esquema de directorios con el nuevo modelo SOA. |
+| `bcv_service/api.py` & `settings.py` | Implementada validación en BD y CORS habilitado para la API BCV. |
+| `apps/app_saas_core/views.py` | Creado y registrado `PaymentReportView`; agregada lógica para inyectar MRR. |
+| `templates/core/payment_report.html` | Creada interfaz de listado completo de facturación e ingresos consolidados. |
+| `core_nexo21/urls.py` | Registradas rutas públicas `/api/gateway/` bajo Django Ninja. |
+| `docs/CLARAPOS_INTEGRATION_PLAN.md` | Artifato creado con el mapeo detallado entre ClaraPOS y Nexo21. |
+| `apps/app_saas_auth/models.py` | Migrado `clarapos_tenant_id` al modelo `Organization` de Django. |
+| `apps/app_saas_core/clarapos_sync.py` | Módulo de sincronización remota hacia Supabase Functions. |
 
 ---
 
-### ⚠️ Pendientes Críticos
-- [ ] **Integración Panel <-> API**: Conectar el formulario de pagos (`Payment`) del Orquestador para que llame a la nueva API BCV (`:8081/api/...`) al registrar un cobro, rellenando automáticamente el campo `exchange_rate`.
-- [ ] **Métricas Financieras (MRR)**: Generar un reporte de Ingresos Recurrentes Mensuales en el Dashboard principal.
-- [ ] **Gestión de Caché BCV**: Evitar el scraping excesivo si la tasa ya fue guardada el mismo día en la Base de Datos del servicio BCV.
-- [ ] **Conexión a Supabase (Cuenta B)**: Rellenar el `.env` de la API con los datos reales del nuevo backend como servicio para independizarla de SQLite de forma final.
+### ⚠️ Pendientes Críticos (Planes para mañana)
+- [ ] **Módulo ClaraPOS Middleware**: En el proyecto en Node.js, falta escribir el middleware simple de Express/Deno en la parte frontal que intercepte y valide en tiempo real contra `http://127.0.0.1:8080/api/gateway/license/check/`.
+- [ ] **Hooks de Registros Nexo21**: Modificar `OrganizationCreateView` o un futuro endpoint de registro de inquilinos para llamar de forma automática a `crear_tenant_clarapos()` dentro de un bloque Try-Catch.
+- [ ] **Generar Service Keys**: Generar una API key por defecto desde el Django Admin y agregarlas inter-cruzadas (NEXO21_SERVICE_KEY a ClaraPOS, y VITE_SUPABASE_ANON_KEY de ClaraPOS a Nexo21).
+- [ ] **Manejo de Suspensión en UI de ClaraPOS**: Construir la pantalla "Licencia Vencida" local en el frontend de ClaraPOS en caso de que el Gateway devuelva resultado falso.
 
 ---
 
 ### 📊 Estado de Salud
-**Indicador:** 🌐 **Ecosistema Expandiéndose**  
-*El panel ya no está solo. Ha nacido el primer microservicio hermano preparado para el ecosistema público.*
+**Indicador:** 🔗 **Simbiosis Inminente**  
+*El ecosistema está a una fracción de código (20 líneas de un middleware y 10 líneas de un hook) de concretar la centralización orquestada de un ERP pre-existente, demostrando la escalabilidad horizontal y total desacoplamiento del Orquestador.*
 
 ---
 *Documentado por Antigravity (IA) — 19 de Abril, 2026*

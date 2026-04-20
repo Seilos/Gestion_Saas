@@ -37,11 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'bcv_service',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be before CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,6 +51,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS: Allow the Nexo21 panel and future SaaS clients to call this API
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+]
+# In production, add your real domains here (e.g., 'https://nexo21.app')
+CORS_ALLOW_METHODS = ['GET', 'OPTIONS']
+CORS_URLS_REGEX = r'^/api/.*$'
 
 ROOT_URLCONF = 'core.urls'
 
@@ -73,11 +84,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import os
+import dj_database_url
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv(BASE_DIR / '.env')
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+        conn_max_age=600
+    )
 }
 
 

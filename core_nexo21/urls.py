@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from app_saas_core.gateway_api import gateway_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('app_saas_core.urls')), # Dashboard principal
-    path('auth/', include('app_saas_auth.urls')), # Sistema de identidad
+    path('', include('app_saas_core.urls')),       # Dashboard principal
+    path('auth/', include('app_saas_auth.urls')),   # Sistema de identidad
+    path('api/gateway/', gateway_api.urls),         # 🔐 License Gateway para servicios satélite
 ]
 
 if settings.DEBUG:

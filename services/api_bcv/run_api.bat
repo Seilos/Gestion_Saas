@@ -13,6 +13,7 @@ if exist "%PYTHON_EXE%" (
     echo [OK] Entorno virtual detectado.
     echo [INFO] Iniciando API en el puerto 8081...
     echo.
+    cd /d "%~dp0"
     "%PYTHON_EXE%" manage.py runserver 8081
 ) else (
     echo [CRITICO] No se encuentra el entorno virtual compartido en: %VENV_PATH%

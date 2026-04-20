@@ -1,0 +1,105 @@
+{% extends "layout/master_base.html" %}
+
+{% block title %}Reporte de Cobros | Nexo21 Core{% endblock %}
+{% block page_title %}Reporte de Cobros{% endblock %}
+
+{% block content %}
+
+{# ── KPI Cards ────────────────────────────────────────────────────────────── #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm p-3 text-center" style="border-radius:14px;">
+            <small class="text-muted text-uppercase fw-bold" style="font-size:.65rem;">Total (Mes)</small>
+            <h3 class="fw-bold text-success mb-0">${{ kpi.total_month_usd }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm p-3 text-center" style="border-radius:14px;">
+            <small class="text-muted text-uppercase fw-bold" style="font-size:.65rem;">Cobros (Mes)</small>
+            <h3 class="fw-bold text-primary mb-0">{{ kpi.count_month }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm p-3 text-center" style="border-radius:14px;">
+            <small class="text-muted text-uppercase fw-bold" style="font-size:.65rem;">Total Histórico</small>
+            <h3 class="fw-bold text-info mb-0">${{ kpi.total_all_usd }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm p-3 text-center" style="border-radius:14px;">
+            <small class="text-muted text-uppercase fw-bold" style="font-size:.65rem;">Cobros Totales</small>
+            <h3 class="fw-bold text-warning mb-0">{{ kpi.count_all }}</h3>
+        </div>
+    </div>
+</div>
+
+{# ── Tabla de Cobros ──────────────────────────────────────────────────────── #}
+<div class="card border-0 shadow-sm" style="border-radius:16px; overflow:hidden;">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3 px-4">
+        <h5 class="fw-bold mb-0"><i class="fas fa-file-invoice-dollar text-success me-2"></i>Historial de Cobros</h5>
+        <span class="badge bg-light text-dark border">{{ payments.count }} registros</span>
+    </div>
+
+    {% if payments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Organización</th>
+                    <th>Producto / Plan</th>
+                    <th>Monto USD</th>
+                    <th>Tasa BCV</th>
+                    <th>Monto Bs.</th>
+                    <th>Método</th>
+                    <th>Referencia</th>
+                    <th>Estado</th>
+                    <th class="pe-4">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td class="ps-4 fw-bold">{{ p.organization.name }}</td>
+                    <td>
+                        {% if p.license %}
+                            <small class="d-block text-muted">{{ p.license.product.name }}</small>
+                            <small>{{ p.license.plan.name|default:"—" }}</small>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="fw-bold text-success">${{ p.amount_usd }}</td>
+                    <td class="text-muted small">{{ p.exchange_rate }}</td>
+                    <td class="text-muted small">Bs. {{ p.amount_ves }}</td>
+                    <td>
+                        <span class="badge rounded-pill px-3
+                            {% if p.method == 'zelle' %}bg-info text-dark
+                            {% elif p.method == 'binance' %}bg-warning text-dark
+                            {% elif p.method == 'pago_movil' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ p.get_method_display }}
+                        </span>
+                    </td>
+                    <td><code class="small">{{ p.reference|default:"—" }}</code></td>
+                    <td>
+                        <span class="badge rounded-pill px-3
+                            {% if p.status == 'completed' %}bg-success
+                            {% elif p.status == 'pending' %}bg-warning text-dark
+                            {% elif p.status == 'voided' %}bg-secondary
+                            {% else %}bg-danger{% endif %}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="pe-4 text-muted small">{{ p.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="fas fa-receipt fa-3x mb-3 opacity-25"></i>
+        <p>Aún no hay cobros registrados.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

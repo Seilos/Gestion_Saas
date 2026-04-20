@@ -3,6 +3,8 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
+from django.db.models import Sum, Count
+import requests as http_requests
 from app_saas_auth.models import Organization
 from .models import SaaSProduct, ProductLicense, Payment, ProductPlan
 from .forms import SaaSProductForm, OrganizationWithProductsForm, PaymentForm, ProductPlanForm
@@ -10,6 +12,24 @@ from .forms import SaaSProductForm, OrganizationWithProductsForm, PaymentForm, P
 # --- DASHBOARD ---
 class GlobalDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "core/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        mrr = 0
+        from .models import ProductLicense
+        active_licenses = ProductLicense.objects.filter(is_active=True, deleted_at__isnull=True).select_related('plan')
+        for license in active_licenses:
+            if license.plan and license.plan.price_usd > 0:
+                if license.plan.duration_days == 30:
+                    mrr += license.plan.price_usd
+                elif license.plan.duration_days == 365:
+                    mrr += float(license.plan.price_usd) / 12.0
+                elif license.plan.duration_days > 0:
+                    mrr += (float(license.plan.price_usd) / license.plan.duration_days) * 30.0
+                    
+        context['mrr'] = "{:.2f}".format(mrr)
+        return context
 
 # --- ORGANIZACIONES ---
 class OrganizationListView(LoginRequiredMixin, ListView):
@@ -219,7 +239,19 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
             license = get_object_or_404(ProductLicense, pk=license_id)
             initial['license'] = license
             initial['organization'] = license.organization
-            initial['exchange_rate'] = 36.50
+            
+            # Integración con la API BCV (DaaS)
+            import requests
+            try:
+                response = requests.get('http://127.0.0.1:8081/api/rates/bcv/latest', timeout=2)
+                data = response.json()
+                if data.get('success') and data.get('value'):
+                    initial['exchange_rate'] = data['value']
+                else:
+                    initial['exchange_rate'] = 36.50
+            except Exception:
+                initial['exchange_rate'] = 36.50
+                
         return initial
 
     def get_context_data(self, **kwargs):
@@ -253,6 +285,36 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
                 'message': f"¡Cobro de ${form.instance.amount_usd} registrado con éxito!"
             })
         return response
+
+# --- REPORTE DE COBROS ---
+
+class PaymentReportView(LoginRequiredMixin, TemplateView):
+    template_name = "core/payment_report.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        payments = Payment.objects.select_related(
+            'organization', 'license__product', 'license__plan'
+        ).order_by('-created_at')
+
+        month_agg = payments.filter(created_at__gte=start_of_month).aggregate(
+            total=Sum('amount_usd'), count=Count('id')
+        )
+        all_agg = payments.aggregate(
+            total=Sum('amount_usd'), count=Count('id')
+        )
+
+        context['payments'] = payments
+        context['kpi'] = {
+            'total_month_usd': "{:.2f}".format(month_agg['total'] or 0),
+            'count_month': month_agg['count'] or 0,
+            'total_all_usd': "{:.2f}".format(all_agg['total'] or 0),
+            'count_all': all_agg['count'] or 0,
+        }
+        return context
 
 # --- GESTIÓN DE PLANES ---
 

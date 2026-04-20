@@ -4,7 +4,7 @@ from .views import (
     OrganizationUpdateView, toggle_organization_status,
     ProductListView, ProductCreateView, ProductUpdateView, toggle_product_status,
     SubscriptionListView, renew_license, toggle_license_status, PaymentCreateView,
-    ProductPlanListView, ProductPlanCreateView
+    ProductPlanListView, ProductPlanCreateView, PaymentReportView
 )
 
 urlpatterns = [
@@ -29,4 +29,7 @@ urlpatterns = [
     path('suscripciones/renovar/<uuid:pk>/', renew_license, name='license_renew'),
     path('suscripciones/toggle/<uuid:pk>/', toggle_license_status, name='license_toggle'),
     path('suscripciones/cobrar/<uuid:license_id>/', PaymentCreateView.as_view(), name='payment_create'),
+
+    # Reporte de Cobros
+    path('cobros/', PaymentReportView.as_view(), name='payment_report'),
 ]
