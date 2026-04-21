@@ -34,6 +34,11 @@
         .filter-btn.active { background: #0d6efd; color: white; border-color: #0d6efd; }
 
         .export-btn { font-size: 0.8rem; font-weight: 700; border-radius: 6px; padding: 5px 15px; }
+
+        /* Estilos para cabecera fija de tabla y scroll interno */
+        .history-table-container { max-height: 600px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
+        .history-table-container table { margin-bottom: 0; }
+        .history-table-container thead th { position: sticky; top: 0; background-color: #f8f9fa; z-index: 10; border-bottom: 2px solid #dee2e6; }
     </style>
 </head>
 <body>
@@ -41,7 +46,7 @@
     <header class="hero-section text-center">
         <div class="container">
             <h1 class="display-5 fw-bold mb-1">Nexo 21 <span class="text-cyan">Dólar Venezuela</span></h1>
-            <p class="lead opacity-75 mb-0">Monitor de Divisas y Tasas Oficiales BCV</p>
+            <p class="lead opacity-75 mb-0">Tasas Oficiales de Referencia Cambiaria</p>
         </div>
     </header>
 
@@ -53,7 +58,7 @@
 
         <div class="d-flex justify-content-center mb-4">
             <ul class="nav nav-pills bg-white p-2 rounded-3 shadow-sm" id="mainTab" role="tablist">
-                <li class="nav-item"><button class="nav-link active" id="monitores-tab" data-bs-toggle="pill" data-bs-target="#tab-monitores" type="button" role="tab">Monitores</button></li>
+                <li class="nav-item"><button class="nav-link active" id="tasas-tab" data-bs-toggle="pill" data-bs-target="#tab-tasas" type="button" role="tab">Tasas</button></li>
                 <li class="nav-item"><button class="nav-link" id="graficos-tab" data-bs-toggle="pill" data-bs-target="#tab-graficos" type="button" role="tab">Estadísticas</button></li>
                 <li class="nav-item"><button class="nav-link" id="historial-tab" data-bs-toggle="pill" data-bs-target="#tab-historial" type="button" role="tab">Historial</button></li>
             </ul>
@@ -61,8 +66,8 @@
 
         <div class="tab-content" id="mainTabContent">
             
-            <!-- MONITORES -->
-            <div class="tab-pane fade show active" id="tab-monitores" role="tabpanel">
+            <!-- TASAS (Antes Monitores) -->
+            <div class="tab-pane fade show active" id="tab-tasas" role="tabpanel">
                 <div class="row g-4 justify-content-center text-center">
                     <div class="col-lg-4 col-md-6">
                         <div class="card rate-card card-bcv-usd h-100 p-4">
@@ -76,13 +81,13 @@
                         <div class="card rate-card card-bcv-eur h-100 p-4">
                             <h6 class="fw-bold mb-3">BCV Oficial</h6>
                             <span class="badge bg-primary rounded-pill px-4 mb-3 mx-auto">EURO EUR</span>
-                            <div class="price-text text-primary">Bs. {{ bcv_eur.value|floatformat:4|default:"0.00" }}</div>
+                            <div class="price-text text-primary">Bs. {{ bcv_eur.value|floatformat:8|default:"0.00" }}</div>
                             <div class="pt-3 text-muted small border-top mt-4">Vigencia: {{ bcv_eur.fecha_valor|date:"d/m/Y" }}</div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <div class="card rate-card card-binance h-100 p-4">
-                            <h6 class="fw-bold mb-3">Binance P2P</h6>
+                            <h6 class="fw-bold mb-3">Referencial Binance</h6>
                             <span class="badge text-dark rounded-pill px-4 mb-3 mx-auto" style="background-color: #F3BA2F;">USDT</span>
                             <div class="price-text mt-2" style="color: #F3BA2F;">Bs. {{ binance_usdt.value|floatformat:2|default:"0.00" }}</div>
                             <div class="pt-3 text-muted small border-top mt-4">Refresco: 15 Minutos</div>
@@ -103,20 +108,17 @@
                 </div>
 
                 <div class="disclaimer-box shadow-sm">
-                    <strong>Aviso Legal e Institucional:</strong> Los datos provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. No somos responsables por la veracidad ni actualización instantánea ante fallas en la fuente. La única tasa legalmente vinculante en Venezuela es la emitida por el <strong>Banco Central de Venezuela (BCV)</strong>. Los valores de Binance P2P son referenciales para el sector de trading e interés general.
+                    <strong>Aviso Legal e Institucional:</strong> Los datos provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. No somos responsables por la veracidad ni actualización instantánea ante fallas en la fuente. La única tasa legalmente vinculante en Venezuela es la emitida por el <strong>Banco Central de Venezuela (BCV)</strong>. Los valores de Binance P2P son referenciales y orientativos.
                 </div>
             </div>
 
             <!-- ESTADÍSTICAS -->
             <div class="tab-pane fade" id="tab-graficos" role="tabpanel">
                 <div class="chart-container">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold m-0">Evolución y Spread</h5>
-                        <div class="small fw-semibold">
-                            <span class="me-3"><i class="fas fa-circle text-primary"></i> BCV</span>
-                            <span style="color: #F3BA2F;"><i class="fas fa-circle"></i> Binance</span>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold m-0">Evolución y Variación</h5>
                     </div>
+                    <p class="small text-muted mb-4">Haz clic en la leyenda abajo para ocultar/mostrar cada tasa.</p>
                     <canvas id="compChart" height="90"></canvas>
                 </div>
             </div>
@@ -125,23 +127,17 @@
             <div class="tab-pane fade" id="tab-historial" role="tabpanel">
                 <div class="chart-container">
                     
-                    <!-- Barra de Filtros Dinámicos -->
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-4 mb-4 border-bottom pb-4">
-                        
                         <div class="d-flex flex-wrap gap-2">
                             <a href="?tab=historial&period=month&currency={{ selected_currency }}" class="filter-btn {% if period == 'month' %}active{% endif %}">Mes Curso</a>
                             <a href="?tab=historial&period=3months&currency={{ selected_currency }}" class="filter-btn {% if period == '3months' %}active{% endif %}">3 Meses</a>
-                            
-                            <!-- Años Dinámicos -->
                             {% for year in available_years %}
                                 <a href="?tab=historial&period={{ year }}&currency={{ selected_currency }}" class="filter-btn {% if period == year|stringformat:'s' %}active{% endif %}">{{ year }}</a>
                             {% endfor %}
-                            
                             <a href="?tab=historial&period=all&currency={{ selected_currency }}" class="filter-btn {% if period == 'all' %}active{% endif %}">Todo</a>
                         </div>
 
                         <div class="d-flex gap-2">
-                            <!-- Exportar -->
                             <div class="btn-group">
                                 <button type="button" class="btn btn-outline-success dropdown-toggle export-btn" data-bs-toggle="dropdown">
                                     <i class="fas fa-download me-1"></i> Exportar
@@ -151,7 +147,6 @@
                                     <li><a class="dropdown-item" href="?export=excel&tab=historial&period={{ period }}&currency={{ selected_currency }}">Descargar Excel (.xlsx)</a></li>
                                 </ul>
                             </div>
-
                             <form method="GET" action="." class="d-flex gap-2">
                                 <input type="hidden" name="tab" value="historial">
                                 <input type="hidden" name="period" value="{{ period }}">
@@ -162,9 +157,9 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead class="table-light"><tr><th>Fecha Valor</th><th>Moneda</th><th>Valor (Bs)</th><th>Origen</th></tr></thead>
+                    <div class="table-responsive history-table-container">
+                        <table class="table table-hover align-middle">
+                            <thead><tr><th>Fecha Valor</th><th>Moneda</th><th>Valor Unitario (Bs)</th><th>Fuente / Origen</th></tr></thead>
                             <tbody>{% for e in history_table %}<tr><td class="fw-bold">{{ e.fecha_valor|date:"d/m/Y" }}</td><td><span class="badge bg-light text-dark border">{{ e.currency }}</span></td><td class="fw-bold">Bs. {{ e.value|floatformat:8 }}</td><td class="text-muted small">{{ e.source }}</td></tr>{% endfor %}</tbody>
                         </table>
                     </div>
@@ -173,13 +168,21 @@
         </div>
     </main>
 
+    <footer class="text-center text-muted small py-4">
+        &copy; 2026 Nexo 21 - Todos los derechos reservados.
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
-            if (activeTab) { const tabEl = document.querySelector(`#${activeTab}-tab`); if (tabEl) { new bootstrap.Tab(tabEl).show(); } }
+            if (activeTab) { 
+                const tabId = `#${activeTab}-tab`;
+                const tabEl = document.querySelector(tabId); 
+                if (tabEl) { new bootstrap.Tab(tabEl).show(); } 
+            }
 
             const labels = JSON.parse('{{ chart_labels|safe|escapejs }}');
             const dataBCV = JSON.parse('{{ chart_data_bcv|safe|escapejs }}');
@@ -190,11 +193,27 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'BCV', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3, borderWidth: 3 },
-                        { label: 'Binance', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3, borderWidth: 2 }
+                        { label: 'Tasa Oficial BCV', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3, borderWidth: 3 },
+                        { label: 'Referencial Binance', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3, borderWidth: 2 }
                     ]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                options: { 
+                    responsive: true, 
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        } 
+                    },
+                    scales: {
+                        y: { ticks: { callback: function(value) { return 'Bs.' + value; } } }
+                    }
+                }
             });
         });
     </script>
