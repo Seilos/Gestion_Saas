@@ -1,333 +1,269 @@
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexo21 DaaS | Monitores de Cambio</title>
-    <!-- Usamos Bootstrap 5 CDN -->
+    <title>Nexo 21 | Monitor de Divisas</title>
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome para íconos -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f6f9; /* Fondo claro general del ERP */
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6f9; }
         .hero-section {
-            /* Paleta oscura del ERP: charcoal gris muy oscuro a negro */
-            background: linear-gradient(135deg, #1f2428 0%, #111416 100%);
-            color: white;
-            padding: 80px 0 60px;
-            margin-bottom: -50px;
+            background: linear-gradient(135deg, #1a1d20 0%, #2c3034 100%);
+            color: white; padding: 60px 0 100px; margin-bottom: -50px;
         }
-        /* Color cyan de los títulos y textos resaltados del ERP */
-        .text-cyan-accent {
-            color: #0dcaf0;
-        }
+        .text-cyan { color: #0dcaf0; }
         
-        .rate-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: white;
-            border-top: 5px solid #0d6efd; /* Azul primary del ERP para tarjetas estándar */
+        /* Tabs Personalizadas */
+        .nav-pills .nav-link {
+            color: #6c757d; font-weight: 600; border-radius: 8px; padding: 10px 20px;
+            transition: all 0.3s;
         }
-        
-        /* Modificando bordes superiores según el estilo */
-        .card-usd { border-top-color: #1a1d20; } /* Negro/Oscuro */
-        .card-eur { border-top-color: #0d6efd; } /* Azul Primary */
-        .card-usdt { border-top-color: #198754; } /* Verde Success */
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd; color: white;
+        }
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: rgba(13, 110, 253, 0.05); color: #0d6efd;
+        }
 
-        .rate-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        /* Tarjetas Monitor */
+        .rate-card {
+            border: none; border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+            background: white; border-top: 5px solid transparent;
+            transition: transform 0.2s;
         }
+        .rate-card:hover { transform: translateY(-3px); }
+        .card-bcv-usd { border-top-color: #1a1d20; } /* Negro ERP */
+        .card-bcv-eur { border-top-color: #0d6efd; } /* Azul ERP */
+        .card-binance { border-top-color: #F3BA2F; } /* Amarillo Binance */
+
         .currency-icon {
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 1.3rem;
+            width: 45px; height: 45px; display: flex; align-items: center;
+            justify-content: center; border-radius: 50%; font-size: 1.3rem;
         }
-        .icon-dark { background-color: rgba(26, 29, 32, 0.1); color: #1a1d20; }
-        .icon-primary { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; }
-        .icon-success { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+        .icon-dark { background-color: rgba(26,29,32,0.1); color: #1a1d20; }
+        .icon-primary { background-color: rgba(13,110,253,0.1); color: #0d6efd; }
+        .icon-warning { background-color: rgba(243,186,47,0.1); color: #F3BA2F; }
         
         .price-text {
-            font-size: 2.3rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: #1a1a1a;
+            font-size: 2.2rem; font-weight: 800; color: #1a1d20; letter-spacing: -0.5px;
         }
-        .footer {
-            margin-top: 80px;
-            padding: 40px 0;
-            background-color: #ffffff;
-            border-top: 1px solid #e9ecef;
-        }
+        
+        /* Contenedores de Tabs */
+        .tab-content-container { margin-top: 20px; }
+        .card-inner { border: none; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); }
 
-        /* Disclaimer */
-        .disclaimer-alert {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            text-align: justify;
-        }
+        /* Estilo Historial */
+        .table-custom thead { background-color: #f8f9fa; }
+        .table-custom th { font-weight: 700; color: #495057; text-transform: uppercase; font-size: 0.75rem; border: none; }
+        .table-custom td { vertical-align: middle; padding: 15px; border-color: #f1f1f1; }
 
-        /* Chart Card */
-        .chart-card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.03);
+        .disclaimer-box {
+            background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;
+            border-radius: 8px; padding: 20px; font-size: 0.88rem; line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100 mt-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
-                <i class="fas fa-server text-cyan-accent me-2"></i> Nexo21 API
-            </a>
-            <div class="d-flex gap-3">
-                <a href="/api/docs" class="btn btn-outline-info btn-sm rounded-pill px-4 fw-medium text-cyan-accent border-info">Documentación API</a>
-                <a href="/admin/" class="btn btn-success btn-sm rounded-pill px-4 fw-medium shadow-sm"><i class="fas fa-lock me-1"></i> Administrativo</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Header Hero -->
+    <!-- Header / Navbar Principal -->
     <section class="hero-section text-center">
-        <div class="container mt-4">
-            <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInUp">Monitores de Intercambio <span class="text-cyan-accent">v1.0</span></h1>
-            <p class="lead opacity-75 mb-5 mx-auto" style="max-width: 600px; font-size: 1.1rem;">
-                Infraestructura DaaS de altísima disponibilidad para el ecosistema ERP. 
-                Suministramos la cotización oficial y mercantil en intervalos seguros.
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-2">Nexo 21 <span class="text-cyan">Monitor</span></h1>
+            <p class="lead opacity-75 mb-0 mx-auto" style="max-width: 600px;">
+                Servicio Centralizado de Consulta de Divisas para el Ecosistema Clara POS.
             </p>
         </div>
     </section>
 
-    <!-- Contenido Principal -->
-    <main class="container position-relative z-1">
-        <div class="row justify-content-center g-4">
+    <!-- Contenedor Principal de la App -->
+    <main class="container position-relative z-1 mb-5" style="margin-top: 20px;">
+        
+        <!-- Navegación por Pestañas -->
+        <div class="d-flex justify-content-center mb-4">
+            <ul class="nav nav-pills bg-white p-2 rounded-3 shadow-sm" id="mainTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="monitores-tab" data-bs-toggle="pill" data-bs-target="#tab-monitores" type="button" role="tab">
+                        <i class="fas fa-desktop me-2"></i>Monitores
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="graficos-tab" data-bs-toggle="pill" data-bs-target="#tab-graficos" type="button" role="tab">
+                        <i class="fas fa-chart-line me-2"></i>Estadísticas
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="historial-tab" data-bs-toggle="pill" data-bs-target="#tab-historial" type="button" role="tab">
+                        <i class="fas fa-history me-2"></i>Historial
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenido de las Pestañas -->
+        <div class="tab-content" id="mainTabContent">
             
-            <!-- Tarjeta BCV Dólar (Gris/Oscuro del ERP) -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card rate-card card-usd h-100 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="currency-icon icon-dark">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Oficial BCV</h6>
-                                <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3">Dólar USD</span>
-                            </div>
-                        </div>
-                        <i class="fas fa-check-circle text-success" title="Verificado Oficial"></i>
-                    </div>
+            <!-- PESTAÑA 1: MONITORES -->
+            <div class="tab-pane fade show active" id="tab-monitores" role="tabpanel">
+                <div class="row g-4 justify-content-center">
                     
-                    <div class="mt-4">
-                        <small class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Valor Actual Referencial</small>
-                        <div class="price-text text-dark">
-                            {% if bcv_usd %}
-                                Bs. {{ bcv_usd.value|floatformat:4 }}
-                            {% else %}
-                                --.----
-                            {% endif %}
+                    <!-- Tarjeta BCV Dólar -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-bcv-usd h-100 p-4">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="currency-icon icon-dark"><i class="fas fa-dollar-sign"></i></div>
+                                <div><h6 class="mb-0 fw-bold">Oficial BCV</h6><span class="badge bg-dark rounded-pill px-3">Dólar USD</span></div>
+                            </div>
+                            <div class="price-text">Bs. {{ bcv_usd.value|floatformat:4|default:"0.00" }}</div>
+                            <div class="mt-auto pt-3 text-muted small border-top mt-3"><i class="far fa-calendar-alt me-1"></i> Vigencia: {{ bcv_usd.fecha_valor|date:"d/m/Y" }}</div>
                         </div>
                     </div>
-                    
-                    <div class="mt-4 pt-3 border-top border-light d-flex justify-content-between align-items-center text-muted" style="font-size: 0.85rem;">
-                        <span><i class="far fa-calendar-alt me-1"></i> 
-                            {% if bcv_usd %}{{ bcv_usd.fecha_valor|date:"d M Y" }}{% else %}N/A{% endif %}
-                        </span>
-                        <span class="text-success"><i class="fas fa-sync-alt me-1"></i> Estable</span>
+
+                    <!-- Tarjeta BCV Euro -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-bcv-eur h-100 p-4">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="currency-icon icon-primary"><i class="fas fa-euro-sign"></i></div>
+                                <div><h6 class="mb-0 fw-bold">Oficial BCV</h6><span class="badge bg-primary rounded-pill px-3">Euro EUR</span></div>
+                            </div>
+                            <div class="price-text text-primary">Bs. {{ bcv_eur.value|floatformat:4|default:"0.00" }}</div>
+                            <div class="mt-auto pt-3 text-muted small border-top mt-3"><i class="far fa-calendar-alt me-1"></i> Vigencia: {{ bcv_eur.fecha_valor|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Binance P2P -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-binance h-100 p-4">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="currency-icon icon-warning"><i class="fab fa-btc"></i></div>
+                                <div><h6 class="mb-0 fw-bold">Promedio USDT</h6><span class="badge bg-warning text-dark rounded-pill px-3">Binance P2P</span></div>
+                            </div>
+                            <div class="price-text" style="color: #F3BA2F;">Bs. {{ binance_usdt.value|floatformat:2|default:"0.00" }}</div>
+                            <div class="mt-auto pt-3 text-muted small border-top mt-3"><i class="fas fa-bolt text-warning me-1"></i> Actualización cada 15 min</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer-box mt-5 shadow-sm">
+                    <div class="d-flex gap-3 align-items-start">
+                        <i class="fas fa-balance-scale fs-3 mt-1"></i>
+                        <div>
+                            <h6 class="fw-bold">Aviso Institucional</h6>
+                            <p class="mb-0">
+                                La única tasa de cambio vigente y legalmente vinculante en el territorio nacional es la emitida por el <strong>Banco Central de Venezuela (BCV)</strong>. 
+                                La información de <strong>Binance P2P</strong> se expone únicamente con fines referenciales para traders e interés general del mercado cripto. 
+                                No somos responsables del uso de estos datos en transacciones comerciales externas.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tarjeta BCV Euro (Azul Primary del ERP) -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card rate-card card-eur h-100 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="currency-icon icon-primary">
-                                <i class="fas fa-euro-sign"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Oficial BCV</h6>
-                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3">Euro EUR</span>
-                            </div>
-                        </div>
-                        <i class="fas fa-landmark text-primary opacity-50"></i>
+            <!-- PESTAÑA 2: GRÁFICOS -->
+            <div class="tab-pane fade" id="tab-graficos" role="tabpanel">
+                <div class="card card-inner p-4 bg-white">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-chart-area text-primary me-2"></i> Evolución Dólar BCV</h5>
+                    <canvas id="historyChart" height="90"></canvas>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 3: HISTORIAL -->
+            <div class="tab-pane fade" id="tab-historial" role="tabpanel">
+                <div class="card card-inner p-4 bg-white">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                        <h5 class="fw-bold mb-0">Registros Pasados</h5>
+                        
+                        <form method="GET" action="." class="d-flex gap-2 align-items-center">
+                            <input type="hidden" name="tab" value="historial">
+                            <select name="currency" class="form-select form-select-sm rounded-pill px-3" onchange="this.form.submit()">
+                                {% for cur in available_currencies %}
+                                    <option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>Moneda: {{ cur }}</option>
+                                {% endfor %}
+                            </select>
+                            <noscript><button type="submit" class="btn btn-sm btn-primary">Filtrar</button></noscript>
+                        </form>
                     </div>
-                    
-                    <div class="mt-4">
-                        <small class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Valor Actual Referencial</small>
-                        <div class="price-text text-primary">
-                            {% if bcv_eur %}
-                                Bs. {{ bcv_eur.value|floatformat:4 }}
-                            {% else %}
-                                --.----
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-3 border-top border-light d-flex justify-content-between align-items-center text-muted" style="font-size: 0.85rem;">
-                        <span><i class="far fa-calendar-alt me-1"></i> 
-                            {% if bcv_eur %}{{ bcv_eur.fecha_valor|date:"d M Y" }}{% else %}N/A{% endif %}
-                        </span>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha Valor</th>
+                                    <th>Moneda</th>
+                                    <th>Precio (Bs.)</th>
+                                    <th>Origen</th>
+                                    <th>Sincronización</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in history_table %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ entry.fecha_valor|date:"d/m/Y" }}</td>
+                                    <td><span class="badge bg-light text-dark border px-3 rounded-pill">{{ entry.currency }}</span></td>
+                                    <td class="fw-bold">Bs. {{ entry.value|floatformat:4 }}</td>
+                                    <td class="small">{{ entry.source }}</td>
+                                    <td class="text-muted small">{{ entry.fetched_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-5 text-muted">No hay registros para esta moneda.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tarjeta Binance USDT (Verde Success del ERP para compras/procesar) -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card rate-card card-usdt h-100 p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="currency-icon icon-success">
-                                <i class="fab fa-btc"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">Mercado USDT</h6>
-                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">P2P Binance</span>
-                            </div>
-                        </div>
-                        <span class="spinner-grow spinner-grow-sm text-success opacity-75" role="status" title="En Vivo"></span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <small class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.75rem;">Promedio Mercado Cripto</small>
-                        <div class="price-text text-success">
-                            {% if binance_usdt %}
-                                Bs. {{ binance_usdt.value|floatformat:2 }}
-                            {% else %}
-                                --.----
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-3 border-top border-light d-flex justify-content-between align-items-center text-muted" style="font-size: 0.85rem;">
-                        <span><i class="fas fa-bolt text-warning me-1"></i> Actualización Fluida</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Disclaimer Informativo estilo DolarVzla -->
-        <div class="alert disclaimer-alert mt-5 p-4 d-flex align-items-start gap-3">
-            <i class="fas fa-info-circle fs-4 mt-1"></i>
-            <div>
-                <strong>Aviso:</strong> Los datos de tasas de cambio provienen de la integración directa con 
-                <a href="https://www.bcv.org.ve" class="alert-link text-decoration-none" target="_blank">https://www.bcv.org.ve</a> (y servidores espejos públicos en caso de contingencia). 
-                No somos responsables por la veracidad ni actualización instantánea de la información ante fallas nacionales. 
-                El <strong>Banco Central de Venezuela (BCV)</strong> es el único ente autorizado e institucional para modificar o establecer la tasa oficial en el país. 
-            </div>
-        </div>
-
-        <!-- Gráfico del Histórico -->
-        <div class="card chart-card mt-5 p-0">
-            <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="m-0 fw-bold" style="color: #1a1d20;"><i class="fas fa-chart-area text-info me-2"></i> Evolución Oficial del Dólar (Últimos Días)</h5>
-            </div>
-            <div class="card-body p-4 pt-1">
-                <canvas id="historyChart" height="80"></canvas>
-            </div>
-        </div>
-
-        <!-- Call to Action Tech -->
-        <div class="text-center mt-5 pt-4">
-            <code class="text-success fw-bold bg-success bg-opacity-10 px-3 py-2 rounded-3 shadow-sm border border-success border-opacity-25">
-                GET /api/rates/bcv/latest
-            </code>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer text-center text-muted pb-4">
-        <div class="container">
-            <p class="mb-0 fw-medium" style="color: #1a1d20;">&copy; {{ last_update|date:"Y" }} Ecosistema Nexo21 ERP</p>
-            <small class="opacity-75">Servicio DaaS interno integrado por Supabase & APScheduler.</small>
-        </div>
-    </footer>
-
-
-    <!-- Chart.js CDN -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Leer datos inyectados por Django
+            // Lógica de Persistencia de Tabs
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab');
+            if (activeTab) {
+                const tabEl = document.querySelector(`#${activeTab}-tab`);
+                if (tabEl) {
+                    const tab = new bootstrap.Tab(tabEl);
+                    tab.show();
+                }
+            }
+
+            // Gráfica
             const labels = JSON.parse('{{ chart_labels|safe|escapejs }}');
             const dataP = JSON.parse('{{ chart_data|safe|escapejs }}');
-
             const ctx = document.getElementById('historyChart').getContext('2d');
             
-            // Si no hay datos suficientes, ponemos placeholders visuales
-            const displayLabels = labels.length > 0 ? labels : ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'];
-            const displayData = dataP.length > 0 ? dataP : [0,0,0,0,0];
-
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: displayLabels,
+                    labels: labels,
                     datasets: [{
                         label: 'Dólar BCV (Bs.)',
-                        data: displayData,
-                        borderColor: '#0d6efd', /* Azul Primary del ERP */
+                        data: dataP,
+                        borderColor: '#0d6efd',
                         backgroundColor: 'rgba(13, 110, 253, 0.08)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#0d6efd',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        fill: true,
-                        tension: 0.3
+                        borderWidth: 3, pointRadius: 4, fill: true, tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1a1d20', // Dark tip
-                            padding: 12,
-                            titleFont: { size: 13, family: 'Inter' },
-                            bodyFont: { size: 14, weight: 'bold', family: 'Inter' },
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) { return 'Bs. ' + context.parsed.y.toFixed(4); }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: 'rgba(0,0,0,0.03)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: { family: 'Inter' },
-                                callback: function(value) { return 'Bs. ' + value.toFixed(2); }
-                            }
-                        },
-                        x: {
-                            grid: { display: false, drawBorder: false },
-                            ticks: { font: { family: 'Inter' } }
-                        }
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { grid: { color: 'rgba(0,0,0,0.03)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
