@@ -29,9 +29,11 @@
         .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 25px; font-size: 0.88rem; text-align: justify; margin-top: 20px; }
         .chart-container { border-radius: 12px; background: white; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); }
         
-        /* Filtros Historial */
-        .filter-btn { border-radius: 20px; font-size: 0.85rem; padding: 5px 15px; border: 1px solid #dee2e6; background: white; color: #6c757d; transition: all 0.2s; }
+        .filter-btn { border-radius: 20px; font-size: 0.82rem; padding: 6px 16px; border: 1px solid #dee2e6; background: white; color: #6c757d; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+        .filter-btn:hover { background-color: #f8f9fa; color: #0d6efd; }
         .filter-btn.active { background: #0d6efd; color: white; border-color: #0d6efd; }
+
+        .export-btn { font-size: 0.8rem; font-weight: 700; border-radius: 6px; padding: 5px 15px; }
     </style>
 </head>
 <body>
@@ -45,7 +47,6 @@
 
     <main class="container mb-5">
         
-        <!-- Publicidad Externa Superior -->
         <div class="ad-external-top shadow-sm">
             <div class="text-center"><i class="fas fa-ad me-2"></i> ESPACIO PARA PUBLICIDAD EXTERNA (GOOGLE ADS)</div>
         </div>
@@ -89,7 +90,6 @@
                     </div>
                 </div>
 
-                <!-- BANNER INTERNO PROMOCIONAL (Movido arriba del disclaimer) -->
                 <div class="ad-internal-promo shadow">
                     <div class="row align-items-center">
                         <div class="col-lg-8 text-center text-lg-start mb-3 mb-lg-0">
@@ -102,7 +102,6 @@
                     </div>
                 </div>
 
-                <!-- Disclaimer Completo -->
                 <div class="disclaimer-box shadow-sm">
                     <strong>Aviso Legal e Institucional:</strong> Los datos provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. No somos responsables por la veracidad ni actualización instantánea ante fallas en la fuente. La única tasa legalmente vinculante en Venezuela es la emitida por el <strong>Banco Central de Venezuela (BCV)</strong>. Los valores de Binance P2P son referenciales para el sector de trading e interés general.
                 </div>
@@ -125,25 +124,48 @@
             <!-- HISTORIAL -->
             <div class="tab-pane fade" id="tab-historial" role="tabpanel">
                 <div class="chart-container">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 border-bottom pb-3">
-                        <div class="d-flex gap-2">
+                    
+                    <!-- Barra de Filtros Dinámicos -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-4 mb-4 border-bottom pb-4">
+                        
+                        <div class="d-flex flex-wrap gap-2">
                             <a href="?tab=historial&period=month&currency={{ selected_currency }}" class="filter-btn {% if period == 'month' %}active{% endif %}">Mes Curso</a>
                             <a href="?tab=historial&period=3months&currency={{ selected_currency }}" class="filter-btn {% if period == '3months' %}active{% endif %}">3 Meses</a>
-                            <a href="?tab=historial&period=year&currency={{ selected_currency }}" class="filter-btn {% if period == 'year' %}active{% endif %}">Año Actual</a>
-                            <a href="?tab=historial&period=all&currency={{ selected_currency }}" class="filter-btn {% if period == 'all' %}active{% endif %}">Ver Todo</a>
+                            
+                            <!-- Años Dinámicos -->
+                            {% for year in available_years %}
+                                <a href="?tab=historial&period={{ year }}&currency={{ selected_currency }}" class="filter-btn {% if period == year|stringformat:'s' %}active{% endif %}">{{ year }}</a>
+                            {% endfor %}
+                            
+                            <a href="?tab=historial&period=all&currency={{ selected_currency }}" class="filter-btn {% if period == 'all' %}active{% endif %}">Todo</a>
                         </div>
-                        <form method="GET" action="." class="d-flex gap-2">
-                            <input type="hidden" name="tab" value="historial">
-                            <input type="hidden" name="period" value="{{ period }}">
-                            <select name="currency" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
-                                {% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}
-                            </select>
-                        </form>
+
+                        <div class="d-flex gap-2">
+                            <!-- Exportar -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-success dropdown-toggle export-btn" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download me-1"></i> Exportar
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="?export=csv&tab=historial&period={{ period }}&currency={{ selected_currency }}">Descargar CSV</a></li>
+                                    <li><a class="dropdown-item" href="?export=excel&tab=historial&period={{ period }}&currency={{ selected_currency }}">Descargar Excel (.xlsx)</a></li>
+                                </ul>
+                            </div>
+
+                            <form method="GET" action="." class="d-flex gap-2">
+                                <input type="hidden" name="tab" value="historial">
+                                <input type="hidden" name="period" value="{{ period }}">
+                                <select name="currency" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+                                    {% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}
+                                </select>
+                            </form>
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table align-middle">
-                            <thead class="table-light"><tr><th>Fecha</th><th>Moneda</th><th>Valor</th><th>Origen</th></tr></thead>
-                            <tbody>{% for e in history_table %}<tr><td class="fw-bold">{{ e.fecha_valor|date:"d/m/Y" }}</td><td><span class="badge bg-light text-dark border">{{ e.currency }}</span></td><td class="fw-bold">Bs. {{ e.value|floatformat:4 }}</td><td class="text-muted small">{{ e.source }}</td></tr>{% endfor %}</tbody>
+                            <thead class="table-light"><tr><th>Fecha Valor</th><th>Moneda</th><th>Valor (Bs)</th><th>Origen</th></tr></thead>
+                            <tbody>{% for e in history_table %}<tr><td class="fw-bold">{{ e.fecha_valor|date:"d/m/Y" }}</td><td><span class="badge bg-light text-dark border">{{ e.currency }}</span></td><td class="fw-bold">Bs. {{ e.value|floatformat:8 }}</td><td class="text-muted small">{{ e.source }}</td></tr>{% endfor %}</tbody>
                         </table>
                     </div>
                 </div>

@@ -1,45 +1,75 @@
 from django.shortcuts import render
 from django.utils import timezone
+from django.http import HttpResponse
+from django.db.models import Avg, Q
+from datetime import timedelta, date
 import json
+import pandas as pd
+import io
+
 from bcv_service.models import ExchangeRate
 
-from django.db.models import Avg
-
-from django.db.models import Avg, Q
-from datetime import timedelta
-
 def home_view(request):
-    """Vista Nexo 21 con filtros de tiempo avanzados para el historial."""
+    """Vista Nexo 21 con filtros dinámicos y exportación de datos."""
     today = timezone.now().date()
     
+    # Datos para monitores
     bcv_usd = ExchangeRate.objects.filter(source="BCV", currency="USD", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     bcv_eur = ExchangeRate.objects.filter(source="BCV", currency="EUR", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     binance_usdt = ExchangeRate.objects.filter(source="BINANCE", currency="USDT", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     
-    # --- FILTROS DE HISTORIAL ---
+    # --- FILTROS DINÁMICOS ---
     selected_currency = request.GET.get('currency', 'USD').upper()
     period = request.GET.get('period', 'month') # Default: Mes actual
+    export_format = request.GET.get('export', None)
+    
     available_currencies = ExchangeRate.objects.order_by('currency').values_list('currency', flat=True).distinct()
     
+    # Lista dinámica de años disponibles en la DB
+    available_years = ExchangeRate.objects.dates('fecha_valor', 'year', order='DESC')
+    available_years_list = [y.year for y in available_years]
+
     history_qs_table = ExchangeRate.objects.filter(currency=selected_currency).order_by('-fecha_valor', '-fetched_at')
     
+    # Lógica de filtrado por periodo
     if period == 'month':
         history_qs_table = history_qs_table.filter(fecha_valor__month=today.month, fecha_valor__year=today.year)
     elif period == '3months':
         three_months_ago = today - timedelta(days=90)
         history_qs_table = history_qs_table.filter(fecha_valor__gte=three_months_ago)
-    elif period == 'year':
-        history_qs_table = history_qs_table.filter(fecha_valor__year=today.year)
-    # Si es 'all', no filtramos más.
+    elif period.isdigit(): # Filtro por año específico (ej: 2025, 2024)
+        history_qs_table = history_qs_table.filter(fecha_valor__year=int(period))
+    # 'all' no filtra nada adicional
 
-    history_table = history_qs_table[:250] # Aumentamos el límite para ver más historial
+    # --- LÓGICA DE EXPORTACIÓN ---
+    if export_format:
+        data = list(history_qs_table.values('fecha_valor', 'currency', 'value', 'source'))
+        df = pd.DataFrame(data)
+        filename = f"historial_{selected_currency}_{period}_{today}.{'csv' if export_format == 'csv' else 'xlsx'}"
+        
+        if export_format == 'csv':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            df.to_csv(path_or_buf=response, index=False, encoding='utf-8-sig')
+            return response
+        
+        elif export_format == 'excel':
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Historial')
+            response = HttpResponse(output.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+
+    # Para la vista normal, limitamos la tabla
+    limit = 366 if period.isdigit() or period == 'all' else 50
+    history_table = history_qs_table[:limit]
     
     # --- GRÁFICA COMPARATIVA ---
     history_qs_chart = ExchangeRate.objects.filter(source="BCV", currency="USD", is_active=True).order_by('-fecha_valor')[:15]
     chart_labels = []
     chart_data_bcv = []
     chart_data_binance = []
-    
     for r in reversed(history_qs_chart):
         dia = r.fecha_valor
         chart_labels.append(dia.strftime("%d/%m"))
@@ -54,6 +84,7 @@ def home_view(request):
         'selected_currency': selected_currency,
         'period': period,
         'available_currencies': available_currencies,
+        'available_years': available_years_list,
         'history_table': history_table,
         'last_update': timezone.now(),
         'chart_labels': json.dumps(chart_labels),
