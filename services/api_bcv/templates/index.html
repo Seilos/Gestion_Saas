@@ -12,15 +12,17 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f4f6f9; }
         .hero-section { background: linear-gradient(135deg, #1a1d20 0%, #2c3034 100%); color: white; padding: 40px 0 60px; margin-bottom: -30px; }
+        .hero-section a { text-decoration: none; color: inherit; transition: opacity 0.2s; }
+        .hero-section a:hover { opacity: 0.85; }
         .text-cyan { color: #0dcaf0; }
         
         .ad-external-top { background-color: #ffffff; border: 1px dashed #dee2e6; border-radius: 8px; min-height: 90px; display: flex; align-items: center; justify-content: center; color: #adb5bd; font-size: 0.75rem; margin: 20px auto; max-width: 970px; }
         .ad-internal-promo { background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%); color: white; border-radius: 12px; padding: 25px; margin: 25px 0; box-shadow: 0 10px 20px rgba(13, 110, 253, 0.15); }
 
-        .nav-pills .nav-link { color: #6c757d; font-weight: 600; border-radius: 8px; padding: 10px 25px; }
+        .nav-pills .nav-link { color: #6c757d; font-weight: 600; border-radius: 8px; padding: 10px 25px; border: 1px solid transparent; transition: all 0.2s ease-in-out; }
+        .nav-pills .nav-link:hover:not(.active) { background-color: #e9ecef; border-color: #dee2e6; color: #0d6efd; }
         .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
 
-        /* Estilos de Tarjetas con click para copiar */
         .rate-card { border: none; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); background: white; border-top: 5px solid transparent; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
         .rate-card:active { transform: scale(0.98); }
         .rate-card:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
@@ -31,6 +33,7 @@
         .card-bcv-usd { border-top-color: #1a1d20; }
         .card-bcv-eur { border-top-color: #0d6efd; }
         .card-binance { border-top-color: #F3BA2F; }
+        .card-indicator { border-top-color: #6f42c1; }
         .price-text { font-size: 2.2rem; font-weight: 800; color: #1a1d20; }
 
         .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 25px; font-size: 0.88rem; text-align: justify; margin-top: 20px; }
@@ -42,8 +45,7 @@
 
         .export-btn { font-size: 0.8rem; font-weight: 700; border-radius: 6px; padding: 5px 15px; }
 
-        .history-table-container { max-height: 600px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
-        .history-table-container table { margin-bottom: 0; }
+        .history-table-container { max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
         .history-table-container thead th { position: sticky; top: 0; background-color: #f8f9fa; z-index: 10; border-bottom: 2px solid #dee2e6; }
     </style>
 </head>
@@ -51,8 +53,10 @@
 
     <header class="hero-section text-center">
         <div class="container">
-            <h1 class="display-5 fw-bold mb-1">Nexo 21 <span class="text-cyan">Dólar Venezuela</span></h1>
-            <p class="lead opacity-75 mb-0">Tasas Oficiales de Referencia Cambiaria</p>
+            <a href="/">
+                <h1 class="display-5 fw-bold mb-1">Nexo 21 <span class="text-cyan">Dólar Venezuela</span></h1>
+            </a>
+            <p class="lead opacity-75 mb-0">Tasas Oficiales e Indicadores Económicos</p>
         </div>
     </header>
 
@@ -66,6 +70,7 @@
             <ul class="nav nav-pills bg-white p-2 rounded-3 shadow-sm" id="mainTab" role="tablist">
                 <li class="nav-item"><button class="nav-link active" id="tasas-tab" data-bs-toggle="pill" data-bs-target="#tab-tasas" type="button" role="tab">Tasas</button></li>
                 <li class="nav-item"><button class="nav-link" id="graficos-tab" data-bs-toggle="pill" data-bs-target="#tab-graficos" type="button" role="tab">Estadísticas</button></li>
+                <li class="nav-item"><button class="nav-link" id="indicadores-tab" data-bs-toggle="pill" data-bs-target="#tab-indicadores" type="button" role="tab">Indicadores</button></li>
                 <li class="nav-item"><button class="nav-link" id="historial-tab" data-bs-toggle="pill" data-bs-target="#tab-historial" type="button" role="tab">Historial</button></li>
             </ul>
         </div>
@@ -82,7 +87,6 @@
                             <span class="badge bg-dark rounded-pill px-4 mb-3 mx-auto">DÓLAR USD</span>
                             <div class="price-text">Bs. {{ bcv_usd.value|floatformat:4|default:"0.00" }}</div>
                             <div class="pt-3 text-muted small border-top mt-4">Vigencia: {{ bcv_usd.fecha_valor|date:"d/m/Y" }}</div>
-                            <p class="text-muted mb-0 mt-2" style="font-size: 0.65rem;">Tap para copiar</p>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -92,7 +96,6 @@
                             <span class="badge bg-primary rounded-pill px-4 mb-3 mx-auto">EURO EUR</span>
                             <div class="price-text text-primary">Bs. {{ bcv_eur.value|floatformat:8|default:"0.00" }}</div>
                             <div class="pt-3 text-muted small border-top mt-4">Vigencia: {{ bcv_eur.fecha_valor|date:"d/m/Y" }}</div>
-                            <p class="text-muted mb-0 mt-2" style="font-size: 0.65rem;">Tap para copiar</p>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -102,7 +105,6 @@
                             <span class="badge text-dark rounded-pill px-4 mb-3 mx-auto" style="background-color: #F3BA2F;">USDT</span>
                             <div class="price-text mt-2" style="color: #F3BA2F;">Bs. {{ binance_usdt.value|floatformat:2|default:"0.00" }}</div>
                             <div class="pt-3 text-muted small border-top mt-4">Refresco: 15 Minutos</div>
-                            <p class="text-muted mb-0 mt-2" style="font-size: 0.65rem;">Tap para copiar</p>
                         </div>
                     </div>
                 </div>
@@ -120,58 +122,87 @@
                 </div>
 
                 <div class="disclaimer-box shadow-sm">
-                    <strong>Aviso Legal e Institucional:</strong> Los datos provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. No somos responsables por la veracidad ni actualización instantánea ante fallas en la fuente. La única tasa legalmente vinculante en Venezuela es la emitida por el <strong>Banco Central de Venezuela (BCV)</strong>. Los valores de Binance P2P son referenciales y orientativos.
+                    <strong>Aviso Legal:</strong> Los datos de tasas provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. La única tasa legalmente vinculante es la del Banco Central de Venezuela.
                 </div>
             </div>
 
             <!-- ESTADÍSTICAS -->
             <div class="tab-pane fade" id="tab-graficos" role="tabpanel">
                 <div class="chart-container">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="fw-bold m-0">Evolución y Variación</h5>
                     </div>
-                    <p class="small text-muted mb-4">Haz clic en la leyenda abajo para ocultar/mostrar cada tasa.</p>
                     <canvas id="compChart" height="90"></canvas>
+                </div>
+            </div>
+
+            <!-- INDICADORES -->
+            <div class="tab-pane fade" id="tab-indicadores" role="tabpanel">
+                <div class="row g-4 justify-content-center text-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ interes_activa.value }}', this)">
+                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
+                            <h6 class="fw-bold mb-3">Tasa Interés (Activa)</h6>
+                            <span class="badge bg-secondary rounded-pill px-4 mb-3 mx-auto">PRESTACIONES</span>
+                            <div class="price-text" style="color: #6f42c1;">{{ interes_activa.value }}%</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Periodo: {{ interes_activa.fecha_referencia|date:"F Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ interes_pasiva.value }}', this)">
+                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
+                            <h6 class="fw-bold mb-3">Tasa Interés (Promedio)</h6>
+                            <span class="badge bg-secondary rounded-pill px-4 mb-3 mx-auto">PASIVA / PROMEDIO</span>
+                            <div class="price-text" style="color: #6f42c1;">{{ interes_pasiva.value }}%</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Periodo: {{ interes_pasiva.fecha_referencia|date:"F Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ inflacion.value }}', this)">
+                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
+                            <h6 class="fw-bold mb-3">Inflación (INPC)</h6>
+                            <span class="badge bg-danger rounded-pill px-4 mb-3 mx-auto">MENSUAL</span>
+                            <div class="price-text text-danger">{{ inflacion.value }}%</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Var. {{ inflacion.fecha_referencia|date:"F Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container mt-4">
+                    <h6 class="fw-bold border-bottom pb-2 mb-3">Historial de Indicadores Macro</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead><tr><th>Indicador</th><th>Valor</th><th>Fecha Ref.</th></tr></thead>
+                            <tbody>{% for i in indicadores_list %}<tr><td>{{ i.get_name_display }}</td><td class="fw-bold">{{ i.value }}{{ i.unit }}</td><td>{{ i.fecha_referencia|date:"M Y" }}</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- HISTORIAL -->
             <div class="tab-pane fade" id="tab-historial" role="tabpanel">
                 <div class="chart-container">
-                    
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-4 mb-4 border-bottom pb-4">
                         <div class="d-flex flex-wrap gap-2">
                             <a href="?tab=historial&period=month&currency={{ selected_currency }}" class="filter-btn {% if period == 'month' %}active{% endif %}">Mes Curso</a>
                             <a href="?tab=historial&period=3months&currency={{ selected_currency }}" class="filter-btn {% if period == '3months' %}active{% endif %}">3 Meses</a>
-                            {% for year in available_years %}
-                                <a href="?tab=historial&period={{ year }}&currency={{ selected_currency }}" class="filter-btn {% if period == year|stringformat:'s' %}active{% endif %}">{{ year }}</a>
-                            {% endfor %}
+                            {% for year in available_years %}<a href="?tab=historial&period={{ year }}&currency={{ selected_currency }}" class="filter-btn {% if period == year|stringformat:'s' %}active{% endif %}">{{ year }}</a>{% endfor %}
                             <a href="?tab=historial&period=all&currency={{ selected_currency }}" class="filter-btn {% if period == 'all' %}active{% endif %}">Todo</a>
                         </div>
-
                         <div class="d-flex gap-2">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-outline-success dropdown-toggle export-btn" data-bs-toggle="dropdown">
-                                    <i class="fas fa-download me-1"></i> Exportar
-                                </button>
+                                <button type="button" class="btn btn-outline-success dropdown-toggle export-btn" data-bs-toggle="dropdown"><i class="fas fa-download me-1"></i> Exportar</button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="?export=csv&tab=historial&period={{ period }}&currency={{ selected_currency }}">Descargar CSV</a></li>
-                                    <li><a class="dropdown-item" href="?export=excel&tab=historial&period={{ period }}&currency={{ selected_currency }}">Descargar Excel (.xlsx)</a></li>
+                                    <li><a class="dropdown-item" href="?export=csv&tab=historial&period={{ period }}&currency={{ selected_currency }}">CSV</a></li>
+                                    <li><a class="dropdown-item" href="?export=excel&tab=historial&period={{ period }}&currency={{ selected_currency }}">Excel</a></li>
                                 </ul>
                             </div>
-                            <form method="GET" action="." class="d-flex gap-2">
-                                <input type="hidden" name="tab" value="historial">
-                                <input type="hidden" name="period" value="{{ period }}">
-                                <select name="currency" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
-                                    {% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}
-                                </select>
-                            </form>
+                            <form method="GET" action="." class="d-flex gap-2"><input type="hidden" name="tab" value="historial"><input type="hidden" name="period" value="{{ period }}"><select name="currency" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">{% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}</select></form>
                         </div>
                     </div>
-
                     <div class="table-responsive history-table-container">
                         <table class="table table-hover align-middle">
-                            <thead><tr><th>Fecha Valor</th><th>Moneda</th><th>Valor Unitario (Bs)</th><th>Fuente / Origen</th></tr></thead>
+                            <thead><tr><th>Fecha</th><th>Moneda</th><th>Valor</th><th>Origen</th></tr></thead>
                             <tbody>{% for e in history_table %}<tr><td class="fw-bold">{{ e.fecha_valor|date:"d/m/Y" }}</td><td><span class="badge bg-light text-dark border">{{ e.currency }}</span></td><td class="fw-bold">Bs. {{ e.value|floatformat:8 }}</td><td class="text-muted small">{{ e.source }}</td></tr>{% endfor %}</tbody>
                         </table>
                     </div>
@@ -180,33 +211,22 @@
         </div>
     </main>
 
-    <footer class="text-center text-muted small py-4">
-        &copy; 2026 Nexo 21 - Todos los derechos reservados.
-    </footer>
+    <footer class="text-center text-muted small py-4">&copy; 2026 Nexo 21 - Inteligencia Económica.</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function copyToClipboard(text, element) {
-            // Eliminar espacios o comas innecesarias si las hay
-            const cleanText = text.replace(',', '.');
-            navigator.clipboard.writeText(cleanText).then(() => {
+            navigator.clipboard.writeText(text.replace(',', '.')).then(() => {
                 const badge = element.querySelector('.copy-badge');
                 badge.classList.add('visible');
-                setTimeout(() => {
-                    badge.classList.remove('visible');
-                }, 1500);
+                setTimeout(() => badge.classList.remove('visible'), 1500);
             });
         }
-
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
-            if (activeTab) { 
-                const tabId = `#${activeTab}-tab`;
-                const tabEl = document.querySelector(tabId); 
-                if (tabEl) { new bootstrap.Tab(tabEl).show(); } 
-            }
+            if (activeTab) { const tabEl = document.querySelector(`#${activeTab}-tab`); if (tabEl) { new bootstrap.Tab(tabEl).show(); } }
 
             const labels = JSON.parse('{{ chart_labels|safe|escapejs }}');
             const dataBCV = JSON.parse('{{ chart_data_bcv|safe|escapejs }}');
@@ -214,30 +234,8 @@
             
             new Chart(document.getElementById('compChart'), {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Tasa Oficial BCV', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3, borderWidth: 3 },
-                        { label: 'Referencial Binance', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3, borderWidth: 2 }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    plugins: { 
-                        legend: { 
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: { size: 12, weight: 'bold' }
-                            }
-                        } 
-                    },
-                    scales: {
-                        y: { ticks: { callback: function(value) { return 'Bs.' + value; } } }
-                    }
-                }
+                data: { labels: labels, datasets: [ { label: 'BCV', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3, borderWidth: 3 }, { label: 'Binance', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3, borderWidth: 2 } ] },
+                options: { responsive: true, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true } } } }
             });
         });
     </script>

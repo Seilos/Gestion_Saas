@@ -42,3 +42,24 @@ class ExchangeRate(models.Model):
         if self.fecha_valor > tomorrow:
             raise ValidationError({'fecha_valor': "No se puede registrar una tasa con fecha posterior a mañana."})
 
+
+class EconomicIndicator(models.Model):
+    INDICATOR_CHOICES = (
+        ('INTERES_PRES', 'Interés Prestaciones Sociales'),
+        ('INFLACION', 'Inflación Mensual (INPC)'),
+        ('RESERVAS', 'Reservas Internacionales'),
+    )
+    
+    name = models.CharField(max_length=100, choices=INDICATOR_CHOICES, verbose_name="Nombre del Indicador")
+    value = models.DecimalField(max_digits=20, decimal_places=4, verbose_name="Valor")
+    unit = models.CharField(max_length=20, default='%', help_text="Ej: %, USD, Bs.")
+    fecha_referencia = models.DateField(verbose_name="Fecha del Dato")
+    fetched_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Indicador Económico"
+        verbose_name_plural = "Indicadores Económicos"
+        ordering = ['-fecha_referencia']
+
+    def __str__(self):
+        return f"{self.get_name_display()} - {self.value}{self.unit} ({self.fecha_referencia})"
