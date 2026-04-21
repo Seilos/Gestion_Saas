@@ -8,7 +8,7 @@ class ExchangeRate(models.Model):
     )
     
     source = models.CharField(max_length=50, choices=SOURCE_CHOICES, default='BCV', verbose_name="Fuente de la Tasa")
-    value = models.DecimalField(max_digits=15, decimal_places=4, verbose_name="Valor de la Tasa")
+    value = models.DecimalField(max_digits=20, decimal_places=8, verbose_name="Valor de la Tasa")
     fecha_valor = models.DateField(verbose_name="Fecha Valor Oficial", help_text="La fecha dada por la fuente para esta tasa")
     
     currency = models.CharField(max_length=10, default='USD', verbose_name="Moneda", help_text="Ej: USD, EUR, CNY, TRY, RUB")
