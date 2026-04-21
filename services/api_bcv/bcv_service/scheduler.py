@@ -98,8 +98,8 @@ def update_indicators():
 def start_scheduler():
     scheduler = BackgroundScheduler(timezone="America/Caracas")
     
-    # Binance cada 15 minutos
-    scheduler.add_job(update_binance_rates, 'interval', minutes=15, id='binance_job', replace_existing=True)
+    # Binance cada 60 minutos (Balance ideal entre frescura y limpieza de BD)
+    scheduler.add_job(update_binance_rates, 'interval', minutes=60, id='binance_job', replace_existing=True)
     
     # BCV cada 30 minutos
     scheduler.add_job(update_bcv_rates, 'interval', minutes=30, id='bcv_job', replace_existing=True)

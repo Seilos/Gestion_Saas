@@ -121,13 +121,13 @@ def parse_binance_p2p():
             "fiat": "VES",
             "page": 1,
             "rows": 10,
-            "tradeType": "SELL",
+            "tradeType": "BUY", # Cambiamos a BUY para ver el precio de mercado más estable
             "asset": "USDT",
             "countries": [],
             "proMerchantAds": False,
             "shieldMerchantAds": False,
-            "publisherType": None,
-            "payTypes": [],
+            "publisherType": "merchant", # Solo tomamos comerciantes verificados (más confiable)
+            "payTypes": ["Banesco", "PagoMovil"], # Centramos en los métodos más usados
             "classifies": ["mass", "profession"]
         }
         
@@ -136,7 +136,8 @@ def parse_binance_p2p():
         data = response.json()
         
         if data.get('data') and len(data['data']) > 0:
-            prices = [Decimal(ad['adv']['price']) for ad in data['data'][:5]]
+            # Tomamos el promedio de los primeros 3 anuncios de comerciantes (más estable)
+            prices = [Decimal(ad['adv']['price']) for ad in data['data'][:3]]
             avg_price = sum(prices) / len(prices)
             
             return {

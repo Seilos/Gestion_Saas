@@ -116,3 +116,27 @@ def get_latest_binance_rate(request):
 
     return {"success": False, "source": "BINANCE", "error": "No hay datos de Binance. Scheduler ejecutando.", "value": 0, "fetched_at": timezone.now().isoformat()}
 
+class IndicatorResponse(Schema):
+    name: str
+    value: Decimal
+    unit: str
+    fecha_referencia: date
+    fetched_at: str
+    success: bool = True
+
+@api.get("/indicators/latest", response=List[IndicatorResponse], summary="Obtener últimos indicadores macro")
+@rate_limit(max_requests=20, timeout=60)
+def get_indicators(request):
+    from .models import EconomicIndicator
+    indicadores = []
+    for code, label in EconomicIndicator.INDICATOR_CHOICES:
+        ind = EconomicIndicator.objects.filter(name=code).order_by('-fecha_referencia').first()
+        if ind:
+            indicadores.append({
+                "name": ind.get_name_display(),
+                "value": ind.value,
+                "unit": ind.unit,
+                "fecha_referencia": ind.fecha_referencia,
+                "fetched_at": ind.fetched_at.isoformat()
+            })
+    return indicadores

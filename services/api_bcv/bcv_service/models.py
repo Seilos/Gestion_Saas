@@ -22,9 +22,6 @@ class ExchangeRate(models.Model):
         verbose_name_plural = "Tasas de Cambio"
         ordering = ['-fecha_valor', '-fetched_at']
         
-        # Avoid saving identical dates from the same source and currency multiple times
-        unique_together = ('source', 'currency', 'fecha_valor')
-
     def __str__(self):
         return f"{self.get_source_display()} - {self.value} {self.currency} to VED ({self.fecha_valor})"
 
