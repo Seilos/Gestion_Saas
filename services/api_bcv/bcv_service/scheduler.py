@@ -88,15 +88,24 @@ def update_binance_rates():
         logger.error(f"Error en tarea Binance: {result.get('error')}")
 
 
+def update_indicators():
+    """Tarea programada para revisar inflación y tasas de interés (Diaria)"""
+    logger.info("Iniciando tarea programada: Verificación de Indicadores Económicos...")
+    from bcv_service.scraper import update_economic_indicators
+    update_economic_indicators()
+    logger.info("Verificación de indicadores finalizada.")
+
 def start_scheduler():
     scheduler = BackgroundScheduler(timezone="America/Caracas")
     
-    # Binance se actualiza cada 15 minutos siempre
+    # Binance cada 15 minutos
     scheduler.add_job(update_binance_rates, 'interval', minutes=15, id='binance_job', replace_existing=True)
     
-    # BCV se actualiza cada 30 minutos (suficiente para captar cuando lo actualicen alrededor de las 3pm)
-    # y así evitamos golpear el BCV tan seguido.
+    # BCV cada 30 minutos
     scheduler.add_job(update_bcv_rates, 'interval', minutes=30, id='bcv_job', replace_existing=True)
     
+    # Indicadores Macro una vez al día (a las 6:00 AM)
+    scheduler.add_job(update_indicators, 'cron', hour=6, minute=0, id='indicators_job', replace_existing=True)
+
     scheduler.start()
-    logger.info("Scheduler de tasas en segundo plano iniciado.")
+    logger.info("Scheduler total (Tasas + Indicadores) iniciado.")

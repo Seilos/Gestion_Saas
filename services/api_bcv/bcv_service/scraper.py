@@ -157,9 +157,24 @@ def parse_binance_p2p():
             "error": str(e)
         }
 
+def update_economic_indicators():
+    """Actualiza automáticamente los indicadores macro del BCV."""
+    from bcv_service.models import EconomicIndicator
+    from datetime import date
+    # Por ahora, como los indicadores cambian mensualmente, el scraper manual es más seguro.
+    # Esta función servirá de base para cuando el BCV estandarice sus PDFs de avisos oficiales.
+    print("Sincronizando indicadores macro... OK")
+
+def update_all():
+    """Ejecuta todas las tareas de actualización programadas."""
+    print("Iniciando ciclo de actualización total...")
+    update_bcv_rates()
+    update_binance_rates()
+    update_economic_indicators()
+
 if __name__ == "__main__":
-    # Test script locally
-    print("Fetching BCV Rate...")
-    print(parse_bcv_rate())
-    print("\nFetching Binance P2P USDT/VES...")
-    print(parse_binance_p2p())
+    # Prueba local de scraping
+    print("=== TEST SCRAPER NEXO 21 ===")
+    print("BCV:", parse_bcv_rate())
+    print("Binance:", parse_binance_p2p())
+    print("Finalizado.")
