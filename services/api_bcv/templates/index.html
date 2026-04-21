@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexo 21 Dólar Venezuela | Precio BCV Hoy</title>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Consulta el precio del Dólar BCV en Venezuela en tiempo real. Nexo 21 te ofrece la tasa oficial del Banco Central de Venezuela, Euro, Binance P2P y monitoreos históricos.">
-    <meta name="keywords" content="dolar bcv, dolar venezuela hoy, nexo 21 dolar, precio bcv, tasa oficial venezuela, binance p2p ves, dolar hoy">
+    <meta name="description" content="Consulta el precio del Dólar BCV y monitoreo de divisas en tiempo real. Nexo 21 te ofrece la tasa oficial del Banco Central de Venezuela, Euro y Binance P2P.">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -17,140 +15,167 @@
         body { font-family: 'Inter', sans-serif; background-color: #f4f6f9; }
         .hero-section {
             background: linear-gradient(135deg, #1a1d20 0%, #2c3034 100%);
-            color: white; padding: 50px 0 80px; margin-bottom: -40px;
+            color: white; padding: 40px 0 60px; margin-bottom: -30px;
         }
         .text-cyan { color: #0dcaf0; }
         
-        /* Tabs */
-        .nav-pills .nav-link { color: #6c757d; font-weight: 600; border-radius: 8px; padding: 10px 20px; transition: all 0.3s; }
-        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
-
         /* Publicidad */
-        .ad-slot-horizontal {
+        .ad-external-top {
             background-color: #ffffff; border: 1px dashed #dee2e6; border-radius: 8px;
             min-height: 90px; display: flex; align-items: center; justify-content: center;
-            color: #adb5bd; font-size: 0.8rem; margin-bottom: 25px; overflow: hidden;
+            color: #adb5bd; font-size: 0.75rem; margin: 20px auto; max-width: 970px;
         }
-        .promo-card {
-            background: linear-gradient(45deg, #0d6efd, #0dcaf0); color: white;
-            border: none; border-radius: 12px; padding: 20px;
+        .ad-internal-bottom {
+            background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%);
+            color: white; border-radius: 12px; padding: 30px; margin-top: 40px;
+            box-shadow: 0 10px 20px rgba(13, 110, 253, 0.15);
         }
+
+        /* Tabs */
+        .nav-pills .nav-link { color: #6c757d; font-weight: 600; border-radius: 8px; padding: 10px 25px; transition: all 0.3s; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; }
 
         /* Tarjetas */
         .rate-card { border: none; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); background: white; border-top: 5px solid transparent; }
         .card-bcv-usd { border-top-color: #1a1d20; }
+        .card-bcv-eur { border-top-color: #0d6efd; }
         .card-binance { border-top-color: #F3BA2F; }
-        .price-text { font-size: 2.2rem; font-weight: 800; color: #1a1d20; letter-spacing: -0.5px; }
+        .price-text { font-size: 2.1rem; font-weight: 800; color: #1a1d20; letter-spacing: -0.5px; }
 
-        .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 20px; font-size: 0.88rem; }
+        .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 25px; font-size: 0.88rem; text-align: justify; }
+        .chart-container { border-radius: 12px; background: white; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); }
     </style>
 </head>
 <body>
 
-    <section class="hero-section text-center">
+    <!-- Header Principal -->
+    <header class="hero-section text-center">
         <div class="container">
-            <h1 class="display-5 fw-bold mb-2">Nexo 21 <span class="text-cyan">Dólar Venezuela</span></h1>
-            <p class="lead opacity-75 mb-0 mx-auto" style="max-width: 600px;">Precio del Dólar BCV y monitoreo de divisas en tiempo real.</p>
+            <h1 class="display-5 fw-bold mb-1">Nexo 21 <span class="text-cyan">Dólar Venezuela</span></h1>
+            <p class="lead opacity-75 mb-0">Monitor de Divisas y Tasas Oficiales en Tiempo Real</p>
         </div>
-    </section>
+    </header>
 
-    <main class="container position-relative z-1 mb-5" style="margin-top: 15px;">
+    <main class="container mb-5">
         
-        <!-- Publicidad Superior (Google Adsense Placeholder) -->
-        <div class="ad-slot-horizontal shadow-sm">
+        <!-- ESPACIO PUBLICIDAD EXTERNA (Top) -->
+        <div class="ad-external-top shadow-sm">
             <div class="text-center">
-                <small class="d-block text-uppercase mb-1" style="letter-spacing: 1px;">Espacio Publicitario</small>
-                <i class="fas fa-ad fa-lg"></i>
+                <i class="fas fa-ad me-2"></i> ANUNCIE AQUÍ (GOOGLE ADS / EXTERNO)
             </div>
         </div>
 
-        <!-- Navegación -->
+        <!-- Navegación por Pestañas -->
         <div class="d-flex justify-content-center mb-4">
             <ul class="nav nav-pills bg-white p-2 rounded-3 shadow-sm" id="mainTab" role="tablist">
-                <li class="nav-item"><button class="nav-link active" id="monitores-tab" data-bs-toggle="pill" data-bs-target="#tab-monitores" type="button" role="tab">Monitores</button></li>
-                <li class="nav-item"><button class="nav-link" id="graficos-tab" data-bs-toggle="pill" data-bs-target="#tab-graficos" type="button" role="tab">Estadísticas</button></li>
-                <li class="nav-item"><button class="nav-link" id="historial-tab" data-bs-toggle="pill" data-bs-target="#tab-historial" type="button" role="tab">Historial</button></li>
+                <li class="nav-item"><button class="nav-link active" id="monitores-tab" data-bs-toggle="pill" data-bs-target="#tab-monitores" type="button" role="tab"><i class="fas fa-desktop me-2"></i>Monitores</button></li>
+                <li class="nav-item"><button class="nav-link" id="graficos-tab" data-bs-toggle="pill" data-bs-target="#tab-graficos" type="button" role="tab"><i class="fas fa-chart-line me-2"></i>Comparativa</button></li>
+                <li class="nav-item"><button class="nav-link" id="historial-tab" data-bs-toggle="pill" data-bs-target="#tab-historial" type="button" role="tab"><i class="fas fa-history me-2"></i>Historial</button></li>
             </ul>
         </div>
 
         <div class="tab-content" id="mainTabContent">
             
-            <!-- MONITORES -->
+            <!-- PESTAÑA 1: MONITORES -->
             <div class="tab-pane fade show active" id="tab-monitores" role="tabpanel">
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="card rate-card card-bcv-usd h-100 p-4">
-                                    <h6 class="mb-0 fw-bold">Oficial BCV</h6><span class="badge bg-dark rounded-pill px-3 w-50 my-2">Dólar USD</span>
-                                    <div class="price-text mt-2">Bs. {{ bcv_usd.value|floatformat:4|default:"0.00" }}</div>
-                                    <div class="pt-3 text-muted small border-top mt-3"><i class="far fa-calendar-alt"></i> {{ bcv_usd.fecha_valor|date:"d/m/Y" }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card rate-card card-binance h-100 p-4">
-                                    <h6 class="mb-0 fw-bold">Binance P2P</h6><span class="badge bg-warning text-dark rounded-pill px-3 w-50 my-2">USDT</span>
-                                    <div class="price-text mt-2" style="color: #F3BA2F;">Bs. {{ binance_usdt.value|floatformat:2|default:"0.00" }}</div>
-                                    <div class="pt-3 text-muted small border-top mt-3"><i class="fas fa-bolt"></i> Actualizado cada 15 min</div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Disclaimer -->
-                        <div class="disclaimer-box mt-4 shadow-sm">
-                            <small><strong>Aviso:</strong> La única tasa legal es la del BCV. Binance es referencial para traders e interés general.</small>
+                <div class="row g-4 justify-content-center">
+                    
+                    <!-- BCV USD -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-bcv-usd h-100 p-4 text-center">
+                            <h6 class="fw-bold mb-3">BCV Oficial</h6>
+                            <span class="badge bg-dark rounded-pill px-4 py-2 mx-auto mb-3">DÓLAR USD</span>
+                            <div class="price-text mt-2">Bs. {{ bcv_usd.value|floatformat:4|default:"0.00" }}</div>
+                            <div class="pt-3 text-muted small border-top mt-4"><i class="far fa-calendar-alt"></i> Vigencia: {{ bcv_usd.fecha_valor|date:"d/m/Y" }}</div>
                         </div>
                     </div>
 
-                    <!-- Sidebar de Publicidad Propia / Nexo 21 -->
-                    <div class="col-lg-4">
-                        <div class="card promo-card h-100 d-flex flex-column justify-content-center shadow-lg">
-                            <div class="text-center">
-                                <i class="fas fa-rocket fa-3x mb-3 text-white"></i>
-                                <h4 class="fw-bold">Clara POS</h4>
-                                <p class="small opacity-75">El ERP más potente de Venezuela. Automatiza tu negocio hoy mismo.</p>
-                                <a href="#" class="btn btn-light rounded-pill px-4 fw-bold text-primary btn-sm">Más información</a>
-                            </div>
+                    <!-- BCV EUR (Restaurado) -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-bcv-eur h-100 p-4 text-center">
+                            <h6 class="fw-bold mb-3">BCV Oficial</h6>
+                            <span class="badge bg-primary rounded-pill px-4 py-2 mx-auto mb-3">EURO EUR</span>
+                            <div class="price-text text-primary mt-2">Bs. {{ bcv_eur.value|floatformat:4|default:"0.00" }}</div>
+                            <div class="pt-3 text-muted small border-top mt-4"><i class="far fa-calendar-alt"></i> Vigencia: {{ bcv_eur.fecha_valor|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Binance P2P -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card rate-card card-binance h-100 p-4 text-center">
+                            <h6 class="fw-bold mb-3">Binance P2P</h6>
+                            <span class="badge text-dark rounded-pill px-4 py-2 mx-auto mb-3" style="background-color: #F3BA2F;">USDT</span>
+                            <div class="price-text mt-2" style="color: #F3BA2F;">Bs. {{ binance_usdt.value|floatformat:2|default:"0.00" }}</div>
+                            <div class="pt-3 text-muted small border-top mt-4"><i class="fas fa-bolt"></i> Refresco: 15 Minutos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer Completo (Restaurado) -->
+                <div class="disclaimer-alert disclaimer-box mt-5 shadow-sm">
+                    <div class="d-flex gap-4 align-items-start">
+                        <i class="fas fa-exclamation-circle fs-3 text-warning"></i>
+                        <div>
+                            <h6 class="fw-bold m-0 mb-2">Aviso Legal e Institucional</h6>
+                            <p class="mb-0">
+                                Los datos de tasas de cambio provienen de la integración directa con el portal institucional <strong>https://www.bcv.org.ve</strong>. 
+                                No somos responsables por la veracidad ni la actualización instantánea de la información en caso de interrupciones técnicas en la fuente original. 
+                                La única tasa de cambio vigente y legalmente vinculante en el territorio de la República Bolivariana de Venezuela es la emitida por el 
+                                <strong>Banco Central de Venezuela (BCV)</strong>. Los valores del mercado P2P de Binance se suministran únicamente con fines referenciales 
+                                para el sector de trading e interés general.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- GRÁFICOS (Comparativa) -->
+            <!-- PESTAÑA 2: GRÁFICOS -->
             <div class="tab-pane fade" id="tab-graficos" role="tabpanel">
-                <div class="card border-0 shadow-sm p-4 bg-white">
+                <div class="chart-container">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold m-0"><i class="fas fa-chart-line text-primary me-2"></i> Comparativa: BCV vs Binance (Promedios)</h5>
-                        <div class="d-flex gap-3 small">
-                            <span class="d-flex align-items-center"><i class="fas fa-circle text-primary me-1"></i> BCV</span>
-                            <span class="d-flex align-items-center" style="color: #F3BA2F;"><i class="fas fa-circle me-1"></i> Binance</span>
+                        <h5 class="fw-bold m-0"><i class="fas fa-chart-line text-primary me-2"></i> Evolución y Spread Cambiario</h5>
+                        <div class="d-flex gap-3 small fw-semibold">
+                            <span><i class="fas fa-circle text-primary me-1"></i> BCV Oficial</span>
+                            <span style="color: #F3BA2F;"><i class="fas fa-circle me-1"></i> Binance Promedio</span>
                         </div>
                     </div>
-                    <canvas id="compChart" height="100"></canvas>
+                    <canvas id="compChart" height="95"></canvas>
                 </div>
             </div>
 
-            <!-- HISTORIAL -->
+            <!-- PESTAÑA 3: HISTORIAL -->
             <div class="tab-pane fade" id="tab-historial" role="tabpanel">
-                <div class="card border-0 shadow-sm p-4 bg-white">
-                    <form method="GET" action="." class="mb-4">
-                        <input type="hidden" name="tab" value="historial">
-                        <select name="currency" class="form-select w-auto rounded-pill" onchange="this.form.submit()">
-                            {% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}
-                        </select>
-                    </form>
+                <div class="chart-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0"><i class="fas fa-history text-muted me-2"></i> Historial de Registros</h5>
+                        <form method="GET" action="." class="d-flex gap-2">
+                            <input type="hidden" name="tab" value="historial">
+                            <select name="currency" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+                                {% for cur in available_currencies %}<option value="{{ cur }}" {% if selected_currency == cur %}selected{% endif %}>{{ cur }}</option>{% endfor %}
+                            </select>
+                        </form>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table small">
-                            <thead class="table-light"><tr><th>Fecha</th><th>Moneda</th><th>Precio</th></tr></thead>
-                            <tbody>{% for e in history_table %}<tr><td>{{ e.fecha_valor|date:"d/m/Y" }}</td><td>{{ e.currency }}</td><td class="fw-bold">Bs. {{ e.value|floatformat:4 }}</td></tr>{% endfor %}</tbody>
+                        <table class="table align-middle">
+                            <thead class="table-light"><tr><th>Fecha</th><th>Moneda</th><th>Valor</th><th>Origen</th></tr></thead>
+                            <tbody>{% for e in history_table %}<tr><td class="fw-bold">{{ e.fecha_valor|date:"d/m/Y" }}</td><td><span class="badge bg-light text-dark border">{{ e.currency }}</span></td><td class="fw-bold">Bs. {{ e.value|floatformat:4 }}</td><td class="text-muted small">{{ e.source }}</td></tr>{% endfor %}</tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Banner Publicitario Inferior -->
-        <div class="ad-slot-horizontal mt-5 opacity-75">
-            <span>PUBLICIDAD - ANUNCIE AQUÍ</span>
+        <!-- ESPACIO PUBLICIDAD INTERNA (Bottom) -->
+        <div class="ad-internal-bottom text-center">
+            <div class="row align-items-center">
+                <div class="col-lg-8 text-lg-start mb-3 mb-lg-0">
+                    <h3 class="fw-bold mb-1">Impulsa tu negocio con Clara POS</h3>
+                    <p class="mb-0 opacity-90">El ERP definitivo para la gestión de inventarios, ventas y facturación en Venezuela.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="#" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">PRUÉBALO GRATIS</a>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -160,7 +185,7 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Persistencia Tab
+            // Persistencia de Pestañas
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
             if (activeTab) {
@@ -168,7 +193,7 @@
                 if (tabEl) { new bootstrap.Tab(tabEl).show(); }
             }
 
-            // Chart Comparativo
+            // Gráfica Dual
             const labels = JSON.parse('{{ chart_labels|safe|escapejs }}');
             const dataBCV = JSON.parse('{{ chart_data_bcv|safe|escapejs }}');
             const dataBinance = JSON.parse('{{ chart_data_binance|safe|escapejs }}');
@@ -178,11 +203,15 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'BCV (Oficial)', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3 },
-                        { label: 'Binance (Promedio)', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3 }
+                        { label: 'BCV Oficial', data: dataBCV, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.05)', fill: true, tension: 0.3, borderWidth: 3 },
+                        { label: 'Binance P2P', data: dataBinance, borderColor: '#F3BA2F', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.3, borderWidth: 2 }
                     ]
                 },
-                options: { plugins: { legend: { display: false } } }
+                options: { 
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { ticks: { font: { family: 'Inter' } } }, x: { ticks: { font: { family: 'Inter' } } } }
+                }
             });
         });
     </script>
