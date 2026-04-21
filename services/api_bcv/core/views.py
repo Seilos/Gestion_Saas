@@ -32,7 +32,7 @@ def home_view(request):
         history_qs_table = history_qs_table.filter(fecha_valor__year=today.year)
     # Si es 'all', no filtramos más.
 
-    history_table = history_qs_table[:50] # Mostramos un top 50 cómodo
+    history_table = history_qs_table[:250] # Aumentamos el límite para ver más historial
     
     # --- GRÁFICA COMPARATIVA ---
     history_qs_chart = ExchangeRate.objects.filter(source="BCV", currency="USD", is_active=True).order_by('-fecha_valor')[:15]
