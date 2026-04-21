@@ -25,7 +25,7 @@
 
         .rate-card { border: none; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); background: white; border-top: 5px solid transparent; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
         .rate-card:active { transform: scale(0.98); }
-        .rate-card:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+        .rate-card:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.08); transform: translateY(-3px); }
         
         .copy-badge { position: absolute; top: 10px; right: 10px; font-size: 0.7rem; background: #28a745; color: white; padding: 2px 8px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
         .copy-badge.visible { opacity: 1; }
@@ -33,10 +33,13 @@
         .card-bcv-usd { border-top-color: #1a1d20; }
         .card-bcv-eur { border-top-color: #0d6efd; }
         .card-binance { border-top-color: #F3BA2F; }
-        .card-indicator { border-top-color: #6f42c1; }
-        .price-text { font-size: 2.2rem; font-weight: 800; color: #1a1d20; }
+        .card-indicator-act { border-top-color: #6f42c1; }
+        .card-indicator-prom { border-top-color: #0dcaf0; }
+        .card-indicator-inf { border-top-color: #dc3545; }
 
-        .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 25px; font-size: 0.88rem; text-align: justify; margin-top: 20px; }
+        .price-text { font-size: 2rem; font-weight: 800; color: #1a1d20; }
+
+        .disclaimer-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; padding: 20px; font-size: 0.82rem; text-align: justify; margin-top: 20px; }
         .chart-container { border-radius: 12px; background: white; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); }
         
         .filter-btn { border-radius: 20px; font-size: 0.82rem; padding: 6px 16px; border: 1px solid #dee2e6; background: white; color: #6c757d; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
@@ -47,6 +50,10 @@
 
         .history-table-container { max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
         .history-table-container thead th { position: sticky; top: 0; background-color: #f8f9fa; z-index: 10; border-bottom: 2px solid #dee2e6; }
+        
+        .download-hint { font-size: 0.62rem; color: #6c757d; font-weight: 600; margin-top: 15px; border-top: 1px solid #eee; pt-2; }
+        .download-hint i { color: #0d6efd; margin-right: 4px; }
+        .usage-tag { font-size: 0.65rem; color: #6f42c1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -122,7 +129,9 @@
                 </div>
 
                 <div class="disclaimer-box shadow-sm">
-                    <strong>Aviso Legal:</strong> Los datos de tasas provienen de <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. La única tasa legalmente vinculante es la del Banco Central de Venezuela.
+                    <strong>Aviso Legal de Cumplimiento:</strong> Los datos de tasas oficiales proceden directamente de la fuente oficial <a href="https://www.bcv.org.ve" target="_blank">bcv.org.ve</a>. Nexo 21 aclara que la única tasa legalmente vinculante para transacciones comerciales y contables es la del <strong>Banco Central de Venezuela (BCV)</strong>.
+                    <br><br>
+                    La tasa <strong>"Referencial Binance"</strong> se ofrece solo para fines informativos y de análisis. Su uso como marcador para determinación de precios comerciales está prohibido por la normativa vigente.
                 </div>
             </div>
 
@@ -139,43 +148,42 @@
             <!-- INDICADORES -->
             <div class="tab-pane fade" id="tab-indicadores" role="tabpanel">
                 <div class="row g-4 justify-content-center text-center">
+                    <!-- Tasa Activa -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ interes_activa.value }}', this)">
-                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
-                            <h6 class="fw-bold mb-3">Tasa Interés (Activa)</h6>
-                            <span class="badge bg-secondary rounded-pill px-4 mb-3 mx-auto">PRESTACIONES</span>
+                        <div class="card rate-card card-indicator-act h-100 p-4" onclick="downloadIndicator('INTERES_ACTIVA', 'excel')">
+                            <div class="usage-tag mb-2">Uso: Prestaciones Sociales</div>
+                            <h6 class="fw-bold mb-3">Tasa de Interés Activa</h6>
+                            <span class="badge bg-secondary rounded-pill px-4 mb-3 mx-auto">INTERÉS LOTTT</span>
                             <div class="price-text" style="color: #6f42c1;">{{ interes_activa.value }}%</div>
-                            <div class="pt-3 text-muted small border-top mt-4">Periodo: {{ interes_activa.fecha_referencia|date:"F Y" }}</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Referencia: {{ interes_activa.fecha_referencia|date:"F Y" }}</div>
+                            <div class="download-hint pt-2"><i class="fas fa-file-excel"></i> Bajar Historial (Excel)</div>
                         </div>
                     </div>
+                    <!-- Tasa Promedio -->
                     <div class="col-lg-4 col-md-6">
-                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ interes_pasiva.value }}', this)">
-                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
-                            <h6 class="fw-bold mb-3">Tasa Interés (Promedio)</h6>
+                        <div class="card rate-card card-indicator-prom h-100 p-4" onclick="downloadIndicator('INTERES_PROM', 'excel')">
+                            <div class="usage-tag mb-2" style="color: #0dcaf0;">Uso: Prestaciones Sociales</div>
+                            <h6 class="fw-bold mb-3">Tasa Interés Promedio</h6>
                             <span class="badge bg-secondary rounded-pill px-4 mb-3 mx-auto">PASIVA / PROMEDIO</span>
-                            <div class="price-text" style="color: #6f42c1;">{{ interes_pasiva.value }}%</div>
-                            <div class="pt-3 text-muted small border-top mt-4">Periodo: {{ interes_pasiva.fecha_referencia|date:"F Y" }}</div>
+                            <div class="price-text" style="color: #0dcaf0;">{{ interes_pasiva.value }}%</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Referencia: {{ interes_pasiva.fecha_referencia|date:"F Y" }}</div>
+                            <div class="download-hint pt-2"><i class="fas fa-file-excel"></i> Bajar Historial (Excel)</div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card rate-card card-indicator h-100 p-4" onclick="copyToClipboard('{{ inflacion.value }}', this)">
-                            <div class="copy-badge"><i class="fas fa-check me-1"></i> Copiado</div>
+                    <!-- Inflación -->
+                    <div class="col-lg-4 col-md-12">
+                        <div class="card rate-card card-indicator-inf h-100 p-4" onclick="downloadIndicator('INFLACION', 'excel')">
+                            <div class="usage-tag mb-2" style="color: #dc3545;">Uso: Análisis Económico</div>
                             <h6 class="fw-bold mb-3">Inflación (INPC)</h6>
-                            <span class="badge bg-danger rounded-pill px-4 mb-3 mx-auto">MENSUAL</span>
-                            <div class="price-text text-danger">{{ inflacion.value }}%</div>
-                            <div class="pt-3 text-muted small border-top mt-4">Var. {{ inflacion.fecha_referencia|date:"F Y" }}</div>
+                            <span class="badge bg-danger rounded-pill px-4 mb-3 mx-auto">VAR. MENSUAL</span>
+                            <div class="price-text text-danger">{{ inflacion.value|default:"0.00" }}%</div>
+                            <div class="pt-3 text-muted small border-top mt-4">Referencia: {{ inflacion.fecha_referencia|date:"F Y" }}</div>
+                            <div class="download-hint pt-2"><i class="fas fa-file-excel"></i> Bajar Historial (Excel)</div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="chart-container mt-4">
-                    <h6 class="fw-bold border-bottom pb-2 mb-3">Historial de Indicadores Macro</h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover align-middle">
-                            <thead><tr><th>Indicador</th><th>Valor</th><th>Fecha Ref.</th></tr></thead>
-                            <tbody>{% for i in indicadores_list %}<tr><td>{{ i.get_name_display }}</td><td class="fw-bold">{{ i.value }}{{ i.unit }}</td><td>{{ i.fecha_referencia|date:"M Y" }}</td></tr>{% endfor %}</tbody>
-                        </table>
-                    </div>
+                <div class="alert alert-info mt-4 small border-0 shadow-sm" style="background-color: #f8f9fa; color: #6c757d;">
+                    <i class="fas fa-info-circle me-2 text-primary"></i> Las tasas de interés corresponden a los avisos oficiales del BCV para el cálculo de beneficios de la LOTTT.
                 </div>
             </div>
 
@@ -222,6 +230,9 @@
                 badge.classList.add('visible');
                 setTimeout(() => badge.classList.remove('visible'), 1500);
             });
+        }
+        function downloadIndicator(name, format) {
+            window.location.href = `?export=indicator_${format}&name=${name}`;
         }
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);

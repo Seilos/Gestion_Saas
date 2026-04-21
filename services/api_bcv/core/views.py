@@ -13,29 +13,51 @@ def home_view(request):
     """Vista Nexo 21 con tasas, gráficas, historial e indicadores económicos."""
     today = timezone.now().date()
     
-    # Datos para monitores (Tasas)
+    # --- LÓGICA DE EXPORTACIÓN GENERAL ---
+    export_format = request.GET.get('export', None)
+    
+    # Exportación de INDICADORES MACRO (Nueva función)
+    if export_format and export_format.startswith('indicator_'):
+        fmt = 'csv' if 'csv' in export_format else 'excel'
+        indicator_name = request.GET.get('name')
+        
+        # Límite para todo el histórico (aprox 30 años = 360 registros)
+        qs = EconomicIndicator.objects.filter(name=indicator_name).order_by('-fecha_referencia')[:1000]
+        data = list(qs.values('name', 'value', 'unit', 'fecha_referencia'))
+        df = pd.DataFrame(data)
+        
+        filename = f"historial_{indicator_name}_{today}.{'csv' if fmt == 'csv' else 'xlsx'}"
+        
+        if fmt == 'csv':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            df.to_csv(path_or_buf=response, index=False, encoding='utf-8-sig')
+            return response
+        else:
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False)
+            response = HttpResponse(output.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+
+    # --- DATOS PARA VISTA NORMAL ---
     bcv_usd = ExchangeRate.objects.filter(source="BCV", currency="USD", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     bcv_eur = ExchangeRate.objects.filter(source="BCV", currency="EUR", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     binance_usdt = ExchangeRate.objects.filter(source="BINANCE", currency="USDT", is_active=True).order_by('-fecha_valor', '-fetched_at').first()
     
-    # --- INDICADORES ECONÓMICOS ---
-    # Obtenemos el último de cada tipo
-    interes_activa = EconomicIndicator.objects.filter(name='INTERES_PRES').order_by('-fecha_referencia', '-value').first()
-    interes_pasiva = EconomicIndicator.objects.filter(name='INTERES_PRES').order_by('-fecha_referencia', 'value').first() # El menor valor suele ser la pasiva/promedio
+    interes_activa = EconomicIndicator.objects.filter(name='INTERES_ACTIVA').order_by('-fecha_referencia').first()
+    interes_pasiva = EconomicIndicator.objects.filter(name='INTERES_PROM').order_by('-fecha_referencia').first()
     inflacion = EconomicIndicator.objects.filter(name='INFLACION').order_by('-fecha_referencia').first()
-    indicadores_list = EconomicIndicator.objects.all().order_by('-fecha_referencia')[:20]
 
-    # --- FILTROS DINÁMICOS HISTORIAL ---
     selected_currency = request.GET.get('currency', 'USD').upper()
     period = request.GET.get('period', 'month')
-    export_format = request.GET.get('export', None)
     
     available_currencies = ExchangeRate.objects.order_by('currency').values_list('currency', flat=True).distinct()
     available_years = ExchangeRate.objects.dates('fecha_valor', 'year', order='DESC')
     available_years_list = [y.year for y in available_years]
 
     history_qs_table = ExchangeRate.objects.filter(currency=selected_currency).order_by('-fecha_valor', '-fetched_at')
-    
     if period == 'month':
         history_qs_table = history_qs_table.filter(fecha_valor__month=today.month, fecha_valor__year=today.year)
     elif period == '3months':
@@ -44,8 +66,8 @@ def home_view(request):
     elif period.isdigit():
         history_qs_table = history_qs_table.filter(fecha_valor__year=int(period))
 
-    # Exportación
-    if export_format:
+    # Exportación de TASAS (USD/EUR)
+    if export_format in ['csv', 'excel']:
         data = list(history_qs_table.values('fecha_valor', 'currency', 'value', 'source'))
         df = pd.DataFrame(data)
         filename = f"historial_{selected_currency}_{period}.{'csv' if export_format == 'csv' else 'xlsx'}"
@@ -54,7 +76,7 @@ def home_view(request):
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
             df.to_csv(path_or_buf=response, index=False, encoding='utf-8-sig')
             return response
-        elif export_format == 'excel':
+        else:
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 df.to_excel(writer, index=False)
@@ -78,7 +100,6 @@ def home_view(request):
     context = {
         'bcv_usd': bcv_usd, 'bcv_eur': bcv_eur, 'binance_usdt': binance_usdt,
         'interes_activa': interes_activa, 'interes_pasiva': interes_pasiva, 'inflacion': inflacion,
-        'indicadores_list': indicadores_list,
         'selected_currency': selected_currency, 'period': period,
         'available_currencies': available_currencies, 'available_years': available_years_list,
         'history_table': history_table, 'last_update': timezone.now(),

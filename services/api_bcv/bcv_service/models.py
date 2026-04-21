@@ -42,7 +42,8 @@ class ExchangeRate(models.Model):
 
 class EconomicIndicator(models.Model):
     INDICATOR_CHOICES = (
-        ('INTERES_PRES', 'Interés Prestaciones Sociales'),
+        ('INTERES_ACTIVA', 'Tasa de Interés Activa'),
+        ('INTERES_PROM', 'Tasa de Interés Promedio'),
         ('INFLACION', 'Inflación Mensual (INPC)'),
         ('RESERVAS', 'Reservas Internacionales'),
     )
