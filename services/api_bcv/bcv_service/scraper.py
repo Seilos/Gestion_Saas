@@ -79,6 +79,38 @@ def parse_bcv_rate():
             "error": str(e)
         }
 
+def parse_fallback_api():
+    """
+    Usa la API pública (ve.dolarapi.com) como respaldo en caso de que
+    la página oficial del BCV esté caída o bloqueada.
+    """
+    try:
+        response = requests.get("https://ve.dolarapi.com/v1/dolares/oficial", timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        # DolarAPI maneja ISO-8601 (ej. "2026-04-20T00:00:00-04:00")
+        date_iso = data.get("fechaActualizacion", "").split('T')[0]
+        
+        return {
+            "success": True,
+            "date_iso": date_iso,
+            "date_text": "Fallback DolarAPI",
+            "rates": [
+                {
+                    "source": "BCV_FALLBACK", # Logicamente es la misma tasa
+                    "currency": "USD",
+                    "value": Decimal(str(data.get("promedio", 0))),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error en Fallback DolarAPI: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 def parse_binance_p2p():
     try:
         headers = {

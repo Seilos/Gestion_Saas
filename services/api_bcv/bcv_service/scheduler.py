@@ -37,7 +37,34 @@ def update_bcv_rates():
                 logger.error(f"Error guardando tasa programada BCV {rate_data['currency']}: {e}")
         logger.info("Actualización BCV exitosa.")
     else:
-        logger.error(f"Error en tarea BCV: {result.get('error')}")
+        logger.error(f"Error en tarea BCV, intentando Fallback DolarAPI... Motivo: {result.get('error')}")
+        from bcv_service.scraper import parse_fallback_api
+        fallback_res = parse_fallback_api()
+        
+        if fallback_res.get("success"):
+            date_iso = fallback_res.get("date_iso")
+            fecha_valor_dt = today
+            if date_iso:
+                try:
+                    fecha_valor_dt = datetime.strptime(date_iso, "%Y-%m-%d").date()
+                except ValueError:
+                    pass
+            for rate_data in fallback_res.get("rates", []):
+                try:
+                    ExchangeRate.objects.get_or_create(
+                        source="BCV", # Se guarda como BCV normal para no romper queries
+                        currency=rate_data["currency"],
+                        fecha_valor=fecha_valor_dt,
+                        defaults={
+                            "value": rate_data["value"],
+                            "source_url": "https://ve.dolarapi.com/v1/dolares/oficial"
+                        }
+                    )
+                except Exception as e:
+                    pass
+            logger.info("Actualización BCV vía Fallback exitosa.")
+        else:
+            logger.error("Error crítico: Ambos canales (BCV y Fallback) fallaron.")
 
 def update_binance_rates():
     """Función que ejecuta el scraper de Binance en segundo plano y guarda en BD"""
